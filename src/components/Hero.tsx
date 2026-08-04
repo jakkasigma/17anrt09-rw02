@@ -166,7 +166,7 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab }) => {
               🗺️
             </div>
             <div>
-              <span className="block font-black text-2xl text-black">4 Node</span>
+              <span className="block font-black text-2xl text-black">11 Node</span>
               <span className="text-xs font-extrabold text-stone-700">Peta Acara Ceria</span>
             </div>
           </div>
@@ -176,7 +176,7 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab }) => {
               🏆
             </div>
             <div>
-              <span className="block font-black text-2xl text-black">10 Lomba</span>
+              <span className="block font-black text-2xl text-black">9 Lomba</span>
               <span className="text-xs font-extrabold text-stone-700">Anak & Dewasa</span>
             </div>
           </div>

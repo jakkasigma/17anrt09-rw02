@@ -13,7 +13,9 @@ export interface TimelineEvent {
   title: string;
   subtitle: string;
   date: string;
+  dateIso: string;
   time: string;
+  timeStart: string;
   location: string;
   category: 'Pra-Acara' | 'Lomba' | 'Religi/Budaya' | 'Puncak Acara';
   status: EventStatus;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LombaItem } from '../types';
-import { Trophy, Users, Calendar, MapPin, UserCheck, Gift, FileText, PlusCircle, CheckCircle2, Sparkles, Search, Phone } from 'lucide-react';
+import { Trophy, Calendar, MapPin, UserCheck, Gift, PlusCircle, CheckCircle2, Sparkles, Phone } from 'lucide-react';
 import { triggerMerdekaConfetti } from '../utils/confetti';
 
 interface JadwalLombaProps {
@@ -9,8 +9,6 @@ interface JadwalLombaProps {
 }
 
 export const JadwalLomba: React.FC<JadwalLombaProps> = ({ lombaList, onRegister }) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
-  const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeRegisterModal, setActiveRegisterModal] = useState<LombaItem | null>(null);
 
   // Form State
@@ -19,14 +17,31 @@ export const JadwalLomba: React.FC<JadwalLombaProps> = ({ lombaList, onRegister 
   const [phoneNumber, setPhoneNumber] = useState('');
   const [registrationSubmitted, setRegistrationSubmitted] = useState(false);
 
-  const categories = ['Semua', 'Anak-Anak', 'Ibu-Ibu', 'Bapak-Bapak', 'Umum'];
+  const lombaAnak = lombaList.filter((item) => item.category === 'Anak-Anak');
+  const lombaUmum = lombaList.filter((item) => item.category === 'Umum');
 
-  const filteredLomba = lombaList.filter((item) => {
-    const matchesCategory = selectedCategory === 'Semua' || item.category === selectedCategory;
-    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          item.rules.some(r => r.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesCategory && matchesSearch;
-  });
+  const groups = [
+    {
+      title: 'Lomba Anak-Anak',
+      emoji: '🎈',
+      desc: 'Lomba seru untuk putra-putri warga RT 09. Yuk ajak si kecil ikut meramaikan!',
+      items: lombaAnak,
+      pill: 'bg-sky-300',
+      highlight: 'bg-sky-400',
+      underline: 'border-sky-500',
+      rotate: 'rotate-[-1deg]'
+    },
+    {
+      title: 'Lomba Umum',
+      emoji: '👥',
+      desc: 'Ajang kekompakan untuk seluruh warga RT 09. Daftarkan dirimu dan keluarga!',
+      items: lombaUmum,
+      pill: 'bg-emerald-300',
+      highlight: 'bg-emerald-400',
+      underline: 'border-emerald-600',
+      rotate: 'rotate-[1deg]'
+    }
+  ].filter((g) => g.items.length > 0);
 
   const handleSubmitRegistration = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,161 +80,150 @@ export const JadwalLomba: React.FC<JadwalLombaProps> = ({ lombaList, onRegister 
           </p>
         </div>
 
-        {/* Filter & Search Bar Neubrutalism */}
-        <div className="bg-amber-200 border-4 border-black rounded-3xl p-5 shadow-[6px_6px_0px_#000] mb-8 space-y-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            
-            {/* Category Tabs */}
-            <div className="flex flex-wrap items-center gap-2">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-xl font-black text-xs sm:text-sm border-3 border-black transition-all cursor-pointer ${
-                    selectedCategory === cat
-                      ? 'bg-red-500 text-white shadow-[3px_3px_0px_#000] -translate-y-0.5'
-                      : 'bg-white text-black hover:bg-stone-100 shadow-[2px_2px_0px_#000]'
-                  }`}
-                >
-                  {cat === 'Anak-Anak' ? '🎈 Anak-Anak' : cat === 'Ibu-Ibu' ? '👑 Ibu-Ibu' : cat === 'Bapak-Bapak' ? '💪 Bapak-Bapak' : cat}
-                </button>
-              ))}
-            </div>
-
-            {/* Search Input */}
-            <div className="relative w-full md:w-72">
-              <Search className="w-4 h-4 absolute left-3.5 top-3.5 text-stone-500" />
-              <input
-                type="text"
-                placeholder="Cari nama lomba..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white text-black pl-10 pr-4 py-2.5 rounded-xl border-3 border-black shadow-[2px_2px_0px_#000] text-xs font-bold focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </div>
-
-          </div>
-        </div>
-
-        {/* LOMBA GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredLomba.map((lomba) => {
-            const isFull = lomba.maxParticipants ? lomba.registeredCount >= lomba.maxParticipants : false;
-            const isOpen = lomba.status === 'Pendaftaran Dibuka';
-
-            return (
-              <div
-                key={lomba.id}
-                className={`bg-white border-4 border-black rounded-3xl p-6 shadow-[6px_6px_0px_#000] hover:shadow-[10px_10px_0px_#000] hover:-translate-y-1 transition-all flex flex-col justify-between relative ${
-                  !isOpen ? 'opacity-90 bg-stone-50/90' : ''
-                }`}
-              >
-                
-                <div>
-                  {/* Category & Status Badge */}
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <span className="bg-sky-200 text-stone-900 text-xs font-black px-3 py-1 rounded-xl border-2 border-black shadow-[2px_2px_0px_#000]">
-                      {lomba.category}
-                    </span>
-
-                    <span className={`text-xs font-black px-3 py-1 rounded-xl border-2 border-black shadow-[2px_2px_0px_#000] ${
-                      lomba.status === 'Selesai'
-                        ? 'bg-emerald-300 text-black'
-                        : lomba.status === 'Pendaftaran Dibuka'
-                        ? 'bg-amber-300 text-black'
-                        : 'bg-stone-200 text-stone-700'
-                    }`}>
-                      {lomba.status}
-                    </span>
-                  </div>
-
-                  {/* Icon & Title */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-14 h-14 bg-amber-100 rounded-2xl border-3 border-black shadow-[3px_3px_0px_#000] flex items-center justify-center text-3xl shrink-0">
-                      {lomba.emoji}
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-black text-black leading-tight">
-                        {lomba.title}
-                      </h3>
-                      <p className="text-xs font-extrabold text-red-600 mt-0.5 flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5 inline" /> {lomba.date} ({lomba.time})
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Location & PIC */}
-                  <div className="bg-stone-100 border-2 border-black rounded-xl p-3 text-xs font-bold space-y-1 mb-4">
-                    <div className="flex items-center gap-1.5 text-stone-800">
-                      <MapPin className="w-3.5 h-3.5 text-red-600 shrink-0" />
-                      <span>{lomba.location}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-stone-700">
-                      <Phone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>PIC: {lomba.picName} ({lomba.picPhone})</span>
-                    </div>
-                  </div>
-
-                  {/* Rules list */}
-                  <div className="space-y-1.5 mb-4">
-                    <span className="text-xs font-black text-black block">Aturan Main & Syarat:</span>
-                    <ul className="text-xs font-medium text-stone-700 space-y-1">
-                      {lomba.rules.map((rule, idx) => (
-                        <li key={idx} className="flex items-start gap-1.5">
-                          <span className="text-red-500 font-black">•</span>
-                          <span>{rule}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Prizes */}
-                  <div className="bg-emerald-100 border-2 border-black rounded-xl p-3 mb-4">
-                    <span className="text-xs font-black text-emerald-900 flex items-center gap-1 mb-1">
-                      <Gift className="w-3.5 h-3.5 text-emerald-700" /> Hadiah Pemenang:
-                    </span>
-                    <div className="text-xs font-bold text-stone-800 space-y-0.5">
-                      {lomba.prizes.map((p, pIdx) => (
-                        <div key={pIdx} className="text-[11px] truncate">
-                          🏆 {p}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* Bottom Registration Info & Button */}
-                <div className="pt-3 border-t-2 border-black/20">
-                  <div className="flex items-center justify-between mb-3 text-xs font-bold text-stone-700">
-                    <span className="flex items-center gap-1">
-                      <UserCheck className="w-3.5 h-3.5 text-blue-600" />
-                      Peserta Terdaftar:
-                    </span>
-                    <span className="bg-sky-200 text-black px-2 py-0.5 rounded-lg border border-black font-black">
-                      {lomba.registeredCount} {lomba.maxParticipants ? `/ ${lomba.maxParticipants}` : ''} Orang
-                    </span>
-                  </div>
-
-                  {isOpen ? (
-                    <button
-                      onClick={() => setActiveRegisterModal(lomba)}
-                      className="w-full bg-red-500 hover:bg-red-600 text-white font-black text-sm py-2.5 rounded-2xl border-3 border-black shadow-[4px_4px_0px_#000] hover:shadow-[2px_2px_0px_#000] hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      <PlusCircle className="w-4 h-4" />
-                      <span>Daftar Lomba Ini</span>
-                    </button>
-                  ) : (
-                    <div className="bg-stone-200 text-stone-700 font-bold text-xs py-2 px-3 rounded-xl border-2 border-black text-center">
-                      {lomba.status === 'Selesai' ? '✅ Lomba Telah Selesai' : '🔒 Pendaftaran Ditutup'}
-                    </div>
-                  )}
-                </div>
-
+        {/* LOMBA GROUPS */}
+        {groups.map((group) => (
+          <div key={group.title} className="mb-12">
+            {/* Group Header */}
+            <div className={`mb-6 sm:mb-8 border-b-8 ${group.underline} pb-4 sm:pb-6`}>
+              <div className={`inline-flex items-center gap-1.5 sm:gap-2 ${group.pill} text-black font-black text-xs sm:text-sm px-3 sm:px-4 py-1.5 rounded-full border-3 border-black shadow-[3px_3px_0px_#000] ${group.rotate}`}>
+                <span className="text-base sm:text-xl">{group.emoji}</span>
+                <span>{group.title.toUpperCase()}</span>
               </div>
-            );
-          })}
-        </div>
+
+              <h3 className="text-2xl sm:text-4xl font-black text-black tracking-tight mt-3 sm:mt-4">
+                {group.title}{' '}
+                <span className={`${group.highlight} text-black px-2.5 sm:px-3 py-0.5 rounded-xl border-2 sm:border-3 border-black inline-block shadow-[3px_3px_0px_#000] rotate-1`}>
+                  {group.items.length} Lomba
+                </span>
+              </h3>
+
+              <p className="text-stone-600 font-bold text-xs sm:text-sm mt-2 sm:mt-3 max-w-2xl">
+                {group.desc}
+              </p>
+            </div>
+
+            {/* LOMBA GRID - 3 columns all sizes */}
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 lg:gap-6">
+              {group.items.map((lomba) => {
+                const isFull = lomba.maxParticipants ? lomba.registeredCount >= lomba.maxParticipants : false;
+                const isOpen = lomba.status === 'Pendaftaran Dibuka';
+
+                return (
+                  <div
+                    key={lomba.id}
+                    className={`bg-white border-2 sm:border-4 border-black rounded-2xl sm:rounded-3xl p-2 sm:p-6 shadow-[4px_4px_0px_#000] sm:shadow-[6px_6px_0px_#000] hover:shadow-[8px_8px_0px_#000] hover:-translate-y-1 transition-all flex flex-col justify-between relative ${
+                      !isOpen ? 'opacity-90 bg-stone-50/90' : ''
+                    }`}
+                  >
+                    
+                    <div>
+                      {/* Category & Status Badge */}
+                      <div className="flex items-center justify-between gap-1 mb-1.5 sm:mb-3">
+                        <span className="bg-sky-200 text-stone-900 text-[7px] sm:text-xs font-black px-1 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-xl border border-black sm:border-2 shadow-[1px_1px_0px_#000] sm:shadow-[2px_2px_0px_#000] truncate max-w-[64px] sm:max-w-none">
+                          {lomba.category}
+                        </span>
+
+                        <span className={`text-[7px] sm:text-xs font-black px-1 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-xl border border-black sm:border-2 shadow-[1px_1px_0px_#000] sm:shadow-[2px_2px_0px_#000] shrink-0 ${
+                          lomba.status === 'Selesai'
+                            ? 'bg-emerald-300 text-black'
+                            : lomba.status === 'Pendaftaran Dibuka'
+                            ? 'bg-amber-300 text-black'
+                            : 'bg-stone-200 text-stone-700'
+                        }`}>
+                          {lomba.status}
+                        </span>
+                      </div>
+
+                      {/* Icon & Title */}
+                      <div className="flex items-center gap-1.5 sm:gap-3 mb-1.5 sm:mb-3">
+                        <div className="w-8 h-8 sm:w-14 sm:h-14 bg-amber-100 rounded-lg sm:rounded-2xl border-2 sm:border-3 border-black shadow-[2px_2px_0px_#000] flex items-center justify-center text-base sm:text-3xl shrink-0">
+                          {lomba.emoji}
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="text-[11px] sm:text-xl font-black text-black leading-tight truncate">
+                            {lomba.title}
+                          </h4>
+                          <p className="text-[8px] sm:text-xs font-extrabold text-red-600 mt-0.5 flex items-center gap-0.5 sm:gap-1">
+                            <Calendar className="w-2 h-2 sm:w-3.5 sm:h-3.5 inline shrink-0" />
+                            <span className="truncate">{lomba.date} ({lomba.time})</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Location & PIC */}
+                      <div className="bg-stone-100 border border-black sm:border-2 rounded-lg sm:rounded-xl p-1.5 sm:p-3 text-[8px] sm:text-xs font-bold space-y-0.5 sm:space-y-1 mb-1.5 sm:mb-4">
+                        <div className="flex items-center gap-1 sm:gap-1.5 text-stone-800 truncate">
+                          <MapPin className="w-2 h-2 sm:w-3.5 sm:h-3.5 text-red-600 shrink-0" />
+                          <span className="truncate">{lomba.location}</span>
+                        </div>
+                        <div className="flex items-center gap-1 sm:gap-1.5 text-stone-700 truncate">
+                          <Phone className="w-2 h-2 sm:w-3.5 sm:h-3.5 text-emerald-600 shrink-0" />
+                          <span className="truncate">PIC: {lomba.picName}</span>
+                        </div>
+                      </div>
+
+                      {/* Rules list */}
+                      <div className="space-y-0.5 sm:space-y-1.5 mb-1.5 sm:mb-4">
+                        <span className="text-[8px] sm:text-xs font-black text-black block">Aturan:</span>
+                        <ul className="text-[7px] sm:text-xs font-medium text-stone-700 space-y-0.5 sm:space-y-1">
+                          {lomba.rules.map((rule, idx) => (
+                            <li key={idx} className="flex items-start gap-0.5 sm:gap-1.5">
+                              <span className="text-red-500 font-black">•</span>
+                              <span>{rule}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Prizes */}
+                      <div className="bg-emerald-100 border border-black sm:border-2 rounded-lg sm:rounded-xl p-1.5 sm:p-3 mb-1.5 sm:mb-4">
+                        <span className="text-[8px] sm:text-xs font-black text-emerald-900 flex items-center gap-0.5 sm:gap-1 mb-0.5 sm:mb-1">
+                          <Gift className="w-2 h-2 sm:w-3.5 sm:h-3.5 text-emerald-700" /> Hadiah:
+                        </span>
+                        <div className="text-[7px] sm:text-xs font-bold text-stone-800 space-y-0 sm:space-y-0.5">
+                          {lomba.prizes.map((p, pIdx) => (
+                            <div key={pIdx} className="truncate">
+                              🏆 {p}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                    </div>
+
+                    {/* Bottom Registration Info & Button */}
+                    <div className="pt-1.5 sm:pt-3 border-t-2 border-black/20">
+                      <div className="flex items-center justify-between mb-1.5 sm:mb-3 text-[8px] sm:text-xs font-bold text-stone-700">
+                        <span className="flex items-center gap-0.5 sm:gap-1">
+                          <UserCheck className="w-2 h-2 sm:w-3.5 sm:h-3.5 text-blue-600" />
+                          Peserta:
+                        </span>
+                        <span className="bg-sky-200 text-black px-1 py-0.5 sm:px-2 sm:py-0.5 rounded-md sm:rounded-lg border border-black font-black shrink-0">
+                          {lomba.registeredCount} {lomba.maxParticipants ? `/ ${lomba.maxParticipants}` : ''}
+                        </span>
+                      </div>
+
+                      {isOpen ? (
+                        <button
+                          onClick={() => setActiveRegisterModal(lomba)}
+                          className="w-full bg-red-500 hover:bg-red-600 text-white font-black text-[8px] sm:text-sm py-1 sm:py-2.5 rounded-lg sm:rounded-2xl border-2 sm:border-3 border-black shadow-[2px_2px_0px_#000] sm:shadow-[4px_4px_0px_#000] hover:shadow-[1px_1px_0px_#000] sm:hover:shadow-[2px_2px_0px_#000] hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex items-center justify-center gap-0.5 sm:gap-2 cursor-pointer"
+                        >
+                          <PlusCircle className="w-2.5 h-2.5 sm:w-4 sm:h-4" />
+                          <span>Daftar</span>
+                        </button>
+                      ) : (
+                        <div className="bg-stone-200 text-stone-700 font-bold text-[7px] sm:text-xs py-1 sm:py-2 px-1 sm:px-3 rounded-lg sm:rounded-xl border border-black sm:border-2 text-center">
+                          {lomba.status === 'Selesai' ? '✅ Selesai' : '🔒 Ditutup'}
+                        </div>
+                      )}
+                    </div>
+
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
 
         {/* REGISTRATION FORM MODAL NEUBRUTALISM */}
         {activeRegisterModal && (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TimelineEvent, PhotoDocumentation } from '../types';
 import { Calendar, MapPin, Clock, Camera, CheckCircle2, Hourglass, Filter, ChevronRight, Compass, Flag, MousePointerClick } from 'lucide-react';
 
@@ -8,12 +8,103 @@ interface TimelineMapProps {
   onOpenEventDetail: (event: TimelineEvent) => void;
 }
 
+const WAVE_X: [number, number][] = [
+  [60, 80], [950, 920], [380, 340], [980, 940], [40, 90], [880, 850],
+  [120, 150], [940, 900], [300, 260], [970, 930], [80, 130]
+];
+
+const buildPathD = () => {
+  let d = 'M 500 60';
+  WAVE_X.forEach(([x1, x2], i) => {
+    const y0 = 60 + i * 180;
+    const y1 = y0 + 180;
+    d += ` C ${x1} ${y0}, ${x2} ${y1}, 500 ${y1}`;
+  });
+  return d;
+};
+
+const MAP_PATH_D = buildPathD();
+
+const getMarkerPoint = (index: number) => {
+  const [x1, x2] = WAVE_X[index % WAVE_X.length];
+  const y = 60 + index * 180 + 90;
+  const x = (1000 + 3 * (x1 + x2)) / 8;
+  return { x, y };
+};
+
+const bezierPoint = (x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, t: number) => {
+  const mt = 1 - t;
+  const a = mt * mt * mt;
+  const b = 3 * mt * mt * t;
+  const c = 3 * mt * t * t;
+  const d = t * t * t;
+  return {
+    x: a * x0 + b * x1 + c * x2 + d * x3,
+    y: a * y0 + b * y1 + c * y2 + d * y3
+  };
+};
+
+const getPathPointBetween = (i: number, fraction: number) => {
+  const y0 = 60 + i * 180;
+  const [x1, x2] = WAVE_X[i % WAVE_X.length];
+  const [xn1, xn2] = WAVE_X[(i + 1) % WAVE_X.length];
+  if (fraction <= 0.5) {
+    const t = 0.5 + fraction;
+    return bezierPoint(500, y0, x1, y0, x2, y0 + 180, 500, y0 + 180, t);
+  }
+  const t = 2 * fraction - 1;
+  return bezierPoint(500, y0 + 180, xn1, y0 + 180, xn2, y0 + 360, 500, y0 + 360, t);
+};
+
+const formatIso = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+const toMs = (dateIso: string, timeStart: string) =>
+  new Date(`${dateIso}T${timeStart}:00`).getTime();
+
 export const TimelineMap: React.FC<TimelineMapProps> = ({
   events,
   onOpenPhoto,
   onOpenEventDetail,
 }) => {
   const [filterStatus, setFilterStatus] = useState<'semua' | 'selesai' | 'mendatang' | 'anak'>('semua');
+
+  // Today marker: refresh every minute
+  const [now, setNow] = useState<Date>(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60 * 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const nowMs = now.getTime();
+  const todayIso = formatIso(now);
+
+  let marker: { x: number; y: number };
+  let markerIsToday = false;
+
+  const firstMs = toMs(events[0].dateIso, events[0].timeStart);
+  const lastMs = toMs(events[events.length - 1].dateIso, events[events.length - 1].timeStart);
+
+  if (nowMs < firstMs) {
+    marker = { x: 500, y: 60 };
+  } else if (nowMs >= lastMs) {
+    marker = { x: 500, y: 2040 };
+    markerIsToday = todayIso === events[events.length - 1].dateIso;
+  } else {
+    const nextIdx = events.findIndex((e) => toMs(e.dateIso, e.timeStart) > nowMs);
+    const prevIdx = nextIdx - 1;
+    const prevMs = toMs(events[prevIdx].dateIso, events[prevIdx].timeStart);
+    const nextMs = toMs(events[nextIdx].dateIso, events[nextIdx].timeStart);
+    const fraction = (nowMs - prevMs) / (nextMs - prevMs);
+    if (fraction <= 0) {
+      marker = getMarkerPoint(prevIdx);
+    } else if (fraction >= 1) {
+      marker = getMarkerPoint(nextIdx);
+    } else {
+      marker = getPathPointBetween(prevIdx, fraction);
+    }
+    markerIsToday = events[prevIdx].dateIso === todayIso || events[nextIdx].dateIso === todayIso;
+  }
 
   // Filter events
   const filteredEvents = events.filter((evt) => {
@@ -24,8 +115,23 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
   });
 
   const getRotationAngle = (index: number) => {
-    const angles = ['rotate-[-1.5deg]', 'rotate-[1.5deg]', 'rotate-[-2deg]', 'rotate-[2deg]', 'rotate-[-1deg]', 'rotate-[1.5deg]'];
+    const angles = [
+      'rotate-[-2deg]', 'rotate-[1.5deg]', 'rotate-[-3deg]', 'rotate-[2.5deg]',
+      'rotate-[-1deg]', 'rotate-[3deg]', 'rotate-[-2.5deg]', 'rotate-[1deg]',
+      'rotate-[-1.5deg]', 'rotate-[2deg]', 'rotate-[-3deg]', 'rotate-[1.5deg]',
+      'rotate-[-2deg]', 'rotate-[2.5deg]'
+    ];
     return angles[index % angles.length];
+  };
+
+  const getOffsetX = (index: number) => {
+    const offsets = [
+      'lg:-translate-x-[240px]', 'lg:translate-x-[260px]', 'lg:translate-x-2', 'lg:translate-x-[300px]',
+      'lg:-translate-x-[300px]', 'lg:translate-x-[180px]', 'lg:-translate-x-[180px]', 'lg:translate-x-[280px]',
+      'lg:translate-x-12', 'lg:translate-x-[290px]', 'lg:-translate-x-[220px]', 'lg:translate-x-[240px]',
+      'lg:-translate-x-[280px]', 'lg:translate-x-[140px]'
+    ];
+    return offsets[index % offsets.length];
   };
 
   return (
@@ -41,7 +147,7 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
         <Flag className="w-24 h-24" />
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:max-w-[1440px] relative z-10">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-10 space-y-3">
@@ -116,14 +222,14 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
         </div>
 
         {/* ROADMAP ADVENTURE MAP AREA */}
-        <div className="relative py-4">
+        <div className="relative py-2">
 
           {/* SVG WINDING TREASURE MAP DASHED PATH */}
           <div className="absolute inset-0 pointer-events-none block z-0">
-            <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1000 1200">
+            <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1000 2100">
               {/* Outer Thick Black Dash Outline connecting central axis S-curve */}
               <path
-                d="M 500 60 C 200 60, 200 240, 500 240 C 800 240, 800 420, 500 420 C 200 420, 200 600, 500 600 C 800 600, 800 780, 500 780 C 200 780, 200 960, 500 960 C 800 960, 800 1140, 500 1140"
+                d={MAP_PATH_D}
                 fill="none"
                 stroke="#000"
                 strokeWidth="10"
@@ -132,27 +238,55 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
               />
               {/* Inner Crimson Red Treasure Path */}
               <path
-                d="M 500 60 C 200 60, 200 240, 500 240 C 800 240, 800 420, 500 420 C 200 420, 200 600, 500 600 C 800 600, 800 780, 500 780 C 200 780, 200 960, 500 960 C 800 960, 800 1140, 500 1140"
+                d={MAP_PATH_D}
                 fill="none"
                 stroke="#dc2626"
                 strokeWidth="4"
                 strokeDasharray="16 12"
                 strokeLinecap="round"
               />
-              {/* Decorative Treasure Map Icons along curves */}
+              {/* Decorative Treasure Map Icons scattered irregularly */}
               <g>
-                <text x="230" y="150" className="text-2xl font-black">🚩</text>
-                <text x="750" y="330" className="text-2xl font-black">❌</text>
-                <text x="230" y="510" className="text-2xl font-black">🏝️</text>
-                <text x="750" y="690" className="text-2xl font-black">❌</text>
-                <text x="230" y="870" className="text-2xl font-black">🚩</text>
-                <text x="750" y="1050" className="text-2xl font-black">🏆</text>
+                {/* Start marker */}
+                <text x="500" y="48" className="text-3xl font-black">🚩</text>
+                <text x="240" y="150" className="text-2xl font-black">❌</text>
+                <text x="780" y="300" className="text-2xl font-black">🏝️</text>
+                <text x="350" y="540" className="text-2xl font-black">⚓</text>
+                <text x="880" y="690" className="text-2xl font-black">🏴‍☠️</text>
+                <text x="180" y="880" className="text-3xl font-black">🌴</text>
+                <text x="420" y="1080" className="text-2xl font-black">💎</text>
+                <text x="700" y="1020" className="text-2xl font-black">🏆</text>
+                <text x="830" y="1230" className="text-2xl font-black">🗺️</text>
+                <text x="120" y="1380" className="text-xl font-black">🚩</text>
+                <text x="200" y="1500" className="text-2xl font-black">⭐</text>
+                <text x="860" y="1750" className="text-2xl font-black">🎈</text>
+                <text x="300" y="1830" className="text-2xl font-black">🎁</text>
+                {/* End marker */}
+                <text x="500" y="2052" className="text-3xl font-black">🏆</text>
               </g>
             </svg>
           </div>
 
+          {/* TODAY POSITION MARKER ON THE PATH */}
+          <div
+            className="absolute z-20 pointer-events-none"
+            style={{ left: `${(marker.x / 1000) * 100}%`, top: `${(marker.y / 2100) * 100}%` }}
+          >
+            <div className="absolute -translate-x-1/2 -translate-y-1/2">
+              <span className="relative block w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-red-600 border-2 border-black shadow-[2px_2px_0px_#000]">
+                <span className="absolute inset-0 rounded-full bg-red-600 animate-ping"></span>
+              </span>
+            </div>
+
+            <div className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap ${marker.y < 300 ? 'top-4' : '-top-9'}`}>
+              <span className="bg-black text-white text-[10px] sm:text-xs font-black px-2.5 py-1 rounded-lg border-2 border-white shadow-[2px_2px_0px_#000] flex items-center gap-1 animate-pulse">
+                📍 {markerIsToday ? 'HARI INI' : 'KITA DI SINI'}
+              </span>
+            </div>
+          </div>
+
           {/* EVENT CARDS - SAME LAYOUT ALL BREAKPOINTS */}
-          <div className="space-y-6 lg:space-y-12 relative z-10">
+          <div className="space-y-6 lg:space-y-14 relative z-10">
             {filteredEvents.map((evt, index) => {
               const isPast = evt.status === 'selesai';
               const isEven = index % 2 === 0;
@@ -162,7 +296,7 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
               const desktopCardContent = (
                 <div
                   onClick={() => onOpenEventDetail(evt)}
-                  className={`w-full max-w-[150px] sm:max-w-[220px] md:max-w-[280px] lg:max-w-[320px] rounded-2xl p-2 sm:p-4 transition-all duration-300 transform hover:-translate-y-1.5 hover:scale-[1.02] cursor-pointer group ${rotationClass} ${
+                  className={`w-full max-w-[150px] sm:max-w-[220px] md:max-w-[280px] lg:max-w-[340px] ${getOffsetX(index)} rounded-2xl p-2 sm:p-4 transition-all duration-300 transform hover:-translate-y-1.5 hover:scale-[1.02] cursor-pointer group ${rotationClass} ${
                     isPast
                       ? `${evt.bgColor} border-3 border-black shadow-[4px_4px_0px_#000] hover:shadow-[7px_7px_0px_#000]`
                       : `bg-white ${evt.bgColor}/30 border-3 border-dashed border-stone-800 opacity-95 shadow-[4px_4px_0px_rgba(0,0,0,0.8)] hover:shadow-[7px_7px_0px_#000]`
@@ -257,25 +391,15 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
               return (
                 <React.Fragment key={evt.id}>
                   {/* MAP ROW - SAME LAYOUT ALL BREAKPOINTS */}
-                  <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 sm:gap-4 lg:gap-8 relative z-10">
+                  <div className="grid grid-cols-2 items-center gap-1.5 sm:gap-4 lg:gap-10 relative z-10">
                     {/* LEFT COLUMN */}
                     <div className="w-full flex justify-end">
-                      {isEven ? desktopCardContent : <div className="w-full max-w-[150px] sm:max-w-[220px] md:max-w-[280px] lg:max-w-[320px] pointer-events-none opacity-0"></div>}
-                    </div>
-
-                    {/* CENTER POS BADGE */}
-                    <div className="flex flex-col items-center justify-center z-20 shrink-0">
-                      <div
-                        onClick={() => onOpenEventDetail(evt)}
-                        className="w-7 h-7 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-2xl bg-amber-300 border-3 border-black shadow-[3px_3px_0px_#000] flex items-center justify-center font-black text-[9px] sm:text-sm text-black transform hover:scale-110 transition-transform cursor-pointer"
-                      >
-                        POS {evt.stepNumber}
-                      </div>
+                      {isEven ? desktopCardContent : <div className="w-full max-w-[150px] sm:max-w-[220px] md:max-w-[280px] lg:max-w-[340px] pointer-events-none opacity-0"></div>}
                     </div>
 
                     {/* RIGHT COLUMN */}
                     <div className="w-full flex justify-start">
-                      {!isEven ? desktopCardContent : <div className="w-full max-w-[150px] sm:max-w-[220px] md:max-w-[280px] lg:max-w-[320px] pointer-events-none opacity-0"></div>}
+                      {!isEven ? desktopCardContent : <div className="w-full max-w-[150px] sm:max-w-[220px] md:max-w-[280px] lg:max-w-[340px] pointer-events-none opacity-0"></div>}
                     </div>
                   </div>
                 </React.Fragment>
