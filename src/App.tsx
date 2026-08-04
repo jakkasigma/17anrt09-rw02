@@ -15,7 +15,7 @@ import { TimelineEvent, LombaItem, ResidentWish, PhotoDocumentation } from './ty
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('beranda');
   const [events] = useState<TimelineEvent[]>(INITIAL_EVENTS);
-  const [lombaList, setLombaList] = useState<LombaItem[]>(INITIAL_LOMBA);
+  const [lombaList] = useState<LombaItem[]>(INITIAL_LOMBA);
   const [wishes, setWishes] = useState<ResidentWish[]>(INITIAL_WISHES);
 
   // Modal States
@@ -46,21 +46,6 @@ export default function App() {
     }
   };
 
-  // Register for Lomba Handler
-  const handleRegisterLomba = (lombaId: string) => {
-    setLombaList((prev) =>
-      prev.map((item) => {
-        if (item.id === lombaId) {
-          return {
-            ...item,
-            registeredCount: item.registeredCount + 1
-          };
-        }
-        return item;
-      })
-    );
-  };
-
   // Add Wish Handler
   const handleAddWish = (newWish: Omit<ResidentWish, 'id' | 'timestamp' | 'likes'>) => {
     const createdWish: ResidentWish = {
@@ -88,7 +73,7 @@ export default function App() {
               onOpenPhoto={handleOpenPhoto}
               onOpenEventDetail={setSelectedDetailEvent}
             />
-            <JadwalLomba lombaList={lombaList} onRegister={handleRegisterLomba} />
+            <JadwalLomba lombaList={lombaList} />
             <PapanUcapan wishes={wishes} onAddWish={handleAddWish} />
             <KontakPanitia />
           </>
@@ -107,7 +92,7 @@ export default function App() {
 
         {activeTab === 'lomba' && (
           <div className="pt-4">
-            <JadwalLomba lombaList={lombaList} onRegister={handleRegisterLomba} />
+            <JadwalLomba lombaList={lombaList} />
             <PapanUcapan wishes={wishes} onAddWish={handleAddWish} />
           </div>
         )}
