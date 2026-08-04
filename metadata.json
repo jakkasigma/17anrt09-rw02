@@ -1,0 +1,6 @@
+{
+  "name": "Pesta Merdeka RT 09 - HUT RI ke-81",
+  "description": "Website Interaktif Perayaan HUT RI ke-81 Ngadisuryan RT 09 dengan Peta Perjalanan Acara Neubrutalism, Jadwal Lomba, dan Galeri Foto.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
