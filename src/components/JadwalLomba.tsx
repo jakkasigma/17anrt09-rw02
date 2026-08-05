@@ -79,10 +79,11 @@ export const JadwalLomba: React.FC<JadwalLombaProps> = ({ lombaList, onOpenDetai
             {/* ANNOUNCEMENT BOARD GRID - 3 columns all sizes */}
             <div className="grid grid-cols-3 gap-2 sm:gap-4 lg:gap-6">
               {group.items.map((lomba) => (
-                <div
+                <button
+                  type="button"
                   key={lomba.id}
                   onClick={() => onOpenDetail(lomba)}
-                  className="bg-white border-2 sm:border-4 border-black rounded-2xl sm:rounded-3xl p-2 sm:p-4 shadow-[4px_4px_0px_#000] sm:shadow-[6px_6px_0px_#000] hover:shadow-[8px_8px_0px_#000] hover:-translate-y-1 hover:rotate-[-0.5deg] transition-all flex flex-col cursor-pointer group"
+                  className="bg-white border-2 sm:border-4 border-black rounded-2xl sm:rounded-3xl p-2 sm:p-4 shadow-[4px_4px_0px_#000] sm:shadow-[6px_6px_0px_#000] hover:shadow-[8px_8px_0px_#000] hover:-translate-y-1 hover:rotate-[-0.5deg] transition-all flex flex-col cursor-pointer group text-left"
                 >
                   {/* Pin & Emoji */}
                   <div className="flex items-start justify-between mb-1.5 sm:mb-3">
@@ -126,7 +127,7 @@ export const JadwalLomba: React.FC<JadwalLombaProps> = ({ lombaList, onOpenDetai
                       <ChevronRight className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
                     </div>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </div>

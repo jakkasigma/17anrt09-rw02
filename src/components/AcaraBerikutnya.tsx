@@ -1,6 +1,7 @@
 import React from 'react';
 import { TimelineEvent } from '../types';
 import { getEventStatus } from '../utils/eventStatus';
+import { toEventMsWib } from '../utils/date';
 import { Calendar, Clock, MapPin, ChevronRight, Rocket } from 'lucide-react';
 
 interface AcaraBerikutnyaProps {
@@ -8,14 +9,11 @@ interface AcaraBerikutnyaProps {
   onOpenEventDetail: (event: TimelineEvent) => void;
 }
 
-const toMs = (dateIso: string, timeStart: string) =>
-  new Date(`${dateIso}T${timeStart}:00`).getTime();
-
 export const AcaraBerikutnya: React.FC<AcaraBerikutnyaProps> = ({ events, onOpenEventDetail }) => {
   const nowMs = Date.now();
   const upcoming = events
-    .filter((e) => getEventStatus(e.dateIso, e.timeStart) === 'mendatang')
-    .sort((a, b) => toMs(a.dateIso, a.timeStart) - toMs(b.dateIso, b.timeStart));
+    .filter((e) => getEventStatus(e.dateIso, e.timeStart, e.timeEnd) !== 'selesai')
+    .sort((a, b) => toEventMsWib(a.dateIso, a.timeStart) - toEventMsWib(b.dateIso, b.timeStart));
   const next = upcoming[0];
 
   if (!next) {
@@ -37,7 +35,8 @@ export const AcaraBerikutnya: React.FC<AcaraBerikutnyaProps> = ({ events, onOpen
     );
   }
 
-  const daysLeft = Math.ceil((toMs(next.dateIso, next.timeStart) - nowMs) / (1000 * 60 * 60 * 24));
+  const isNow = getEventStatus(next.dateIso, next.timeStart, next.timeEnd) === 'berlangsung';
+  const daysLeft = Math.ceil((toEventMsWib(next.dateIso, next.timeStart) - nowMs) / (1000 * 60 * 60 * 24));
 
   return (
     <section className="py-12 bg-sky-100 border-b-4 border-black relative overflow-hidden">
@@ -75,10 +74,10 @@ export const AcaraBerikutnya: React.FC<AcaraBerikutnyaProps> = ({ events, onOpen
               </span>
               <span
                 className={`text-[10px] font-black px-2.5 py-0.5 rounded-md border-2 border-black shadow-[2px_2px_0px_#000] ${
-                  daysLeft <= 0 ? 'bg-red-500 text-white rotate-[-1deg] animate-pulse' : 'bg-amber-300 text-black rotate-1'
+                  isNow ? 'bg-red-500 text-white rotate-[-1deg] animate-pulse' : 'bg-amber-300 text-black rotate-1'
                 }`}
               >
-                {daysLeft <= 0 ? 'HARI INI!' : `⏳ Tinggal ${daysLeft} hari lagi`}
+                {isNow ? 'SEDANG BERLANGSUNG!' : daysLeft <= 0 ? 'HARI INI!' : `⏳ Tinggal ${daysLeft} hari lagi`}
               </span>
             </div>
 

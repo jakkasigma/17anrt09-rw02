@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Trophy, Compass, Sparkles, Heart, Users, ShieldCheck, Megaphone } from 'lucide-react';
 import { triggerMerdekaConfetti } from '../utils/confetti';
+import { toEventMsWib } from '../utils/date';
 
 interface HeroProps {
   setActiveTab: (tab: string) => void;
@@ -17,7 +18,7 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, stats }) => {
   });
 
   useEffect(() => {
-    const targetDate = new Date('2026-08-17T07:00:00+07:00').getTime();
+    const targetDate = toEventMsWib('2026-08-17', '07:00');
 
     const updateCountdown = () => {
       const now = new Date().getTime();

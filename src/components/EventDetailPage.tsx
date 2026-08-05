@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { TimelineEvent, PhotoDocumentation } from '../types';
 import { getEventStatus } from '../utils/eventStatus';
-import { Calendar, Clock, MapPin, CheckCircle2, Hourglass, Camera, Sparkles, Eye, ArrowLeft, UserCheck, ListChecks, Gift, MessageSquare } from 'lucide-react';
-import { COMMITTEE } from '../data/committee';
+import { Calendar, Clock, MapPin, CheckCircle2, Hourglass, Camera, Sparkles, Eye, ArrowLeft, UserCheck, ListChecks, Gift, MessageSquare, Activity } from 'lucide-react';
+import { COMMITTEE, MAP_LINK } from '../data/committee';
 import { triggerMerdekaConfetti } from '../utils/confetti';
 
 const ROTATION_CLASSES = [
@@ -30,8 +30,8 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({
 
   if (!event) return null;
 
-  const isPast = getEventStatus(event.dateIso, event.timeStart) === 'selesai';
   const isLomba = !!event.status;
+  const dateStatus = getEventStatus(event.dateIso, event.timeStart, event.timeEnd);
 
   return (
     <div className="min-h-screen bg-[#fafaf9] text-stone-900">
@@ -71,9 +71,13 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({
           </span>
 
           {isLomba ? (
-            event.status === 'Selesai' ? (
+            event.status === 'Selesai' || dateStatus === 'selesai' ? (
               <span className="bg-emerald-300 text-black text-xs font-black px-3 py-1 rounded-xl border-2 border-black shadow-[2px_2px_0px_#000] flex items-center gap-1">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-900" /> Status: Selesai
+              </span>
+            ) : dateStatus === 'berlangsung' ? (
+              <span className="bg-red-500 text-white text-xs font-black px-3 py-1 rounded-xl border-2 border-black shadow-[2px_2px_0px_#000] flex items-center gap-1 animate-pulse">
+                <Activity className="w-3.5 h-3.5 text-yellow-200" /> Status: Sedang Berlangsung
               </span>
             ) : event.status === 'Segera' ? (
               <span className="bg-amber-300 text-stone-900 text-xs font-black px-3 py-1 rounded-xl border-2 border-black shadow-[2px_2px_0px_#000] flex items-center gap-1">
@@ -84,9 +88,13 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({
                 <UserCheck className="w-3.5 h-3.5 text-emerald-900" /> Daftar On The Spot
               </span>
             )
-          ) : isPast ? (
+          ) : dateStatus === 'selesai' ? (
             <span className="bg-emerald-300 text-black text-xs font-black px-3 py-1 rounded-xl border-2 border-black shadow-[2px_2px_0px_#000] flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-900" /> Status: Selesai Terlaksana
+            </span>
+          ) : dateStatus === 'berlangsung' ? (
+            <span className="bg-red-500 text-white text-xs font-black px-3 py-1 rounded-xl border-2 border-black shadow-[2px_2px_0px_#000] flex items-center gap-1 animate-pulse">
+              <Activity className="w-3.5 h-3.5 text-yellow-200" /> Status: Sedang Berlangsung
             </span>
           ) : (
             <span className="bg-amber-300 text-stone-900 text-xs font-black px-3 py-1 rounded-xl border-2 border-black shadow-[2px_2px_0px_#000] flex items-center gap-1">
@@ -105,11 +113,32 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({
             <Clock className="w-4 h-4 text-amber-600" />
             <span>{event.time}</span>
           </div>
-          <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-stone-800">
-            <MapPin className="w-4 h-4 text-emerald-600" />
+          <a
+            href={MAP_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Buka lokasi di Google Maps"
+            className="flex items-center gap-2 text-xs sm:text-sm font-bold text-stone-800 hover:text-red-600 hover:underline cursor-pointer"
+          >
+            <MapPin className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>{event.location}</span>
-          </div>
+          </a>
         </div>
+
+        {/* Lomba: daftar on the spot */}
+        {isLomba && event.status === 'Pendaftaran Dibuka' && dateStatus !== 'selesai' && (
+          <div className="bg-emerald-200 border-3 border-black rounded-2xl p-4 flex items-start gap-3 shadow-[4px_4px_0px_#000]">
+            <div className="text-3xl">🏃</div>
+            <div>
+              <h4 className="text-sm font-black text-black">
+                Pendaftaran On The Spot
+              </h4>
+              <p className="text-xs font-bold text-stone-800 leading-relaxed mt-1">
+                Tidak ada pendaftaran online. Datang lebih awal ke lokasi <span className="font-black underline">{event.location}</span> saat lomba berlangsung untuk didaftarkan panitia.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Description */}
         <div>
@@ -136,21 +165,6 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({
           </div>
         </div>
 
-        {/* Lomba: daftar on the spot */}
-        {isLomba && event.status === 'Pendaftaran Dibuka' && (
-          <div className="bg-emerald-200 border-3 border-black rounded-2xl p-4 flex items-start gap-3 shadow-[4px_4px_0px_#000]">
-            <div className="text-3xl">🏃</div>
-            <div>
-              <h4 className="text-sm font-black text-black">
-                Pendaftaran On The Spot
-              </h4>
-              <p className="text-xs font-bold text-stone-800 leading-relaxed mt-1">
-                Tidak ada pendaftaran online. Datang lebih awal ke lokasi <span className="font-black underline">{event.location}</span> saat lomba berlangsung untuk didaftarkan panitia.
-              </p>
-            </div>
-          </div>
-        )}
-
         {/* Lomba: Rules */}
         {event.rules && event.rules.length > 0 && (
           <div>
@@ -168,19 +182,17 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({
           </div>
         )}
 
-        {/* Lomba: Prizes */}
-        {event.prizes && event.prizes.length > 0 && (
-          <div className="bg-emerald-100 border-3 border-black rounded-2xl p-4 shadow-[4px_4px_0px_#000]">
-            <h4 className="text-xs font-black text-emerald-900 uppercase tracking-wider mb-2 flex items-center gap-1">
-              <Gift className="w-3.5 h-3.5 text-emerald-700" /> Hadiah Pemenang
-            </h4>
-            <div className="space-y-1.5">
-              {event.prizes.map((prize, idx) => (
-                <div key={idx} className="text-sm font-black text-emerald-800 flex items-start gap-2">
-                  <span className="text-amber-500 shrink-0">🏅</span>
-                  <span>{prize}</span>
-                </div>
-              ))}
+        {/* Lomba: Prizes (secret teaser) */}
+        {isLomba && (
+          <div className="bg-emerald-100 border-3 border-dashed border-emerald-700 rounded-2xl p-4 shadow-[4px_4px_0px_#000] flex items-start gap-3">
+            <div className="text-3xl">🎁</div>
+            <div>
+              <h4 className="text-sm font-black text-emerald-900 flex items-center gap-1">
+                <Gift className="w-4 h-4 text-emerald-700" /> Hadiah Pemenang
+              </h4>
+              <p className="text-xs font-black text-emerald-800 leading-relaxed mt-1">
+                🤫 Rahasia & kejutan! Hadiah pemenang dirahasiakan panitia — datang & ikut lombanya, buktikan kemampuanmu!
+              </p>
             </div>
           </div>
         )}
@@ -191,6 +203,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({
             <h4 className="text-xs font-black text-stone-500 uppercase tracking-wider mb-2 flex items-center gap-1">
               <UserCheck className="w-3.5 h-3.5 text-black" /> Kontak Person Lomba
             </h4>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {COMMITTEE.map((person) => (
                 <div key={person.waNumber} className="bg-sky-100 border-3 border-black rounded-2xl p-4 flex items-center justify-between gap-3 shadow-[4px_4px_0px_#000]">

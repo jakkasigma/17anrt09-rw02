@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TimelineEvent, PhotoDocumentation } from '../types';
 import { getEventStatus } from '../utils/eventStatus';
+import { toEventMsWib } from '../utils/date';
 import { Calendar, MapPin, Clock, Camera, CheckCircle2, Hourglass, Filter, ChevronRight, Compass, Flag, MousePointerClick } from 'lucide-react';
 
 interface TimelineMapProps {
@@ -60,9 +61,6 @@ const getPathPointBetween = (i: number, fraction: number) => {
 const formatIso = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
-const toMs = (dateIso: string, timeStart: string) =>
-  new Date(`${dateIso}T${timeStart}:00`).getTime();
-
 export const TimelineMap: React.FC<TimelineMapProps> = ({
   events,
   onOpenPhoto,
@@ -94,8 +92,8 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
   let marker: { x: number; y: number };
   let markerIsToday = false;
 
-  const firstMs = toMs(events[0].dateIso, events[0].timeStart);
-  const lastMs = toMs(events[events.length - 1].dateIso, events[events.length - 1].timeStart);
+  const firstMs = toEventMsWib(events[0].dateIso, events[0].timeStart);
+  const lastMs = toEventMsWib(events[events.length - 1].dateIso, events[events.length - 1].timeStart);
 
   if (nowMs < firstMs) {
     marker = { x: 500, y: 60 };
@@ -103,10 +101,10 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
     marker = { x: 500, y: 2040 };
     markerIsToday = todayIso === events[events.length - 1].dateIso;
   } else {
-    const nextIdx = events.findIndex((e) => toMs(e.dateIso, e.timeStart) > nowMs);
+    const nextIdx = events.findIndex((e) => toEventMsWib(e.dateIso, e.timeStart) > nowMs);
     const prevIdx = nextIdx - 1;
-    const prevMs = toMs(events[prevIdx].dateIso, events[prevIdx].timeStart);
-    const nextMs = toMs(events[nextIdx].dateIso, events[nextIdx].timeStart);
+    const prevMs = toEventMsWib(events[prevIdx].dateIso, events[prevIdx].timeStart);
+    const nextMs = toEventMsWib(events[nextIdx].dateIso, events[nextIdx].timeStart);
     const fraction = (nowMs - prevMs) / (nextMs - prevMs);
     if (fraction <= 0) {
       marker = getMarkerPoint(prevIdx);
@@ -120,8 +118,9 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
 
   // Filter events
   const filteredEvents = events.filter((evt) => {
-    if (filterStatus === 'selesai') return getEventStatus(evt.dateIso, evt.timeStart) === 'selesai';
-    if (filterStatus === 'mendatang') return getEventStatus(evt.dateIso, evt.timeStart) === 'mendatang';
+    if (filterStatus === 'selesai') return getEventStatus(evt.dateIso, evt.timeStart, evt.timeEnd) === 'selesai';
+    if (filterStatus === 'mendatang')
+      return getEventStatus(evt.dateIso, evt.timeStart, evt.timeEnd) !== 'selesai';
     if (filterStatus === 'anak') return evt.isKidFriendly === true;
     return true;
   });
@@ -205,7 +204,7 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
               }`}
             >
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
-              <span>Selesai ({events.filter(e => getEventStatus(e.dateIso, e.timeStart) === 'selesai').length})</span>
+              <span>Selesai ({events.filter(e => getEventStatus(e.dateIso, e.timeStart, e.timeEnd) === 'selesai').length})</span>
             </button>
 
             <button
@@ -217,7 +216,7 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
               }`}
             >
               <Hourglass className="w-3.5 h-3.5 text-sky-700" />
-              <span>Mendatang ({events.filter(e => getEventStatus(e.dateIso, e.timeStart) === 'mendatang').length})</span>
+              <span>Mendatang ({events.filter(e => getEventStatus(e.dateIso, e.timeStart, e.timeEnd) !== 'selesai').length})</span>
             </button>
 
             <button
@@ -300,15 +299,18 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
           {/* EVENT CARDS - SAME LAYOUT ALL BREAKPOINTS */}
           <div className="space-y-6 lg:space-y-14 relative z-10">
             {filteredEvents.map((evt, index) => {
-              const isPast = getEventStatus(evt.dateIso, evt.timeStart) === 'selesai';
+              const status = getEventStatus(evt.dateIso, evt.timeStart, evt.timeEnd);
+              const isPast = status === 'selesai';
+              const isOngoing = status === 'berlangsung';
               const isEven = index % 2 === 0;
               const rotationClass = getRotationAngle(index);
 
               {/* Desktop Full Card Content */}
               const desktopCardContent = (
-                <div
+                <button
+                  type="button"
                   onClick={() => onOpenEventDetail(evt)}
-                  className={`w-full max-w-[150px] sm:max-w-[220px] md:max-w-[280px] lg:max-w-[340px] ${getOffsetX(index)} rounded-2xl p-2 sm:p-4 transition-all duration-300 transform hover:-translate-y-1.5 hover:scale-[1.02] cursor-pointer group ${rotationClass} ${
+                  className={`w-full max-w-[150px] sm:max-w-[220px] md:max-w-[280px] lg:max-w-[340px] ${getOffsetX(index)} rounded-2xl p-2 sm:p-4 transition-all duration-300 transform hover:-translate-y-1.5 hover:scale-[1.02] cursor-pointer group text-left ${rotationClass} ${
                     isPast
                       ? `${evt.bgColor} border-3 border-black shadow-[4px_4px_0px_#000] hover:shadow-[7px_7px_0px_#000]`
                       : `bg-white ${evt.bgColor}/30 border-3 border-dashed border-stone-800 opacity-95 shadow-[4px_4px_0px_rgba(0,0,0,0.8)] hover:shadow-[7px_7px_0px_#000]`
@@ -325,7 +327,12 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
                       </span>
                     </div>
 
-                    {isPast ? (
+                    {isOngoing ? (
+                      <span className="bg-red-500 text-white text-[7px] sm:text-[10px] font-black px-1 py-0.5 sm:px-2 rounded-lg border border-black flex items-center gap-0.5 shrink-0 animate-pulse">
+                        <Hourglass className="w-2 h-2 sm:w-3 sm:h-3 text-yellow-200" />
+                        <span>BERLANGSUNG</span>
+                      </span>
+                    ) : isPast ? (
                       <span className="bg-emerald-400 text-black text-[7px] sm:text-[10px] font-black px-1 py-0.5 sm:px-2 rounded-lg border border-black flex items-center gap-0.5 shrink-0">
                         <CheckCircle2 className="w-2 h-2 sm:w-3 sm:h-3 text-emerald-950 fill-emerald-200" />
                         <span>SELESAI</span>
@@ -386,18 +393,12 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
                       </span>
                     )}
 
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onOpenEventDetail(evt);
-                      }}
-                      className="bg-black text-white hover:bg-stone-800 font-black text-[8px] sm:text-[10px] px-1.5 sm:px-2.5 py-1 rounded-lg border border-black shadow-[1.5px_1.5px_0px_#000] flex items-center gap-0.5 sm:gap-1 cursor-pointer group-hover:scale-105 transition-transform"
-                    >
-                      <span>Buka Detail</span>
-                      <ChevronRight className="w-2 h-2 sm:w-3 sm:h-3 text-amber-300" />
-                    </button>
+                    <span className="bg-black text-white hover:bg-stone-800 font-black text-[8px] sm:text-[10px] px-1.5 sm:px-2.5 py-1 rounded-lg border border-black shadow-[1.5px_1.5px_0px_#000] flex items-center gap-0.5 sm:gap-1 pointer-events-none">
+                        <span>Buka Detail</span>
+                        <ChevronRight className="w-2 h-2 sm:w-3 sm:h-3 text-amber-300" />
+                      </span>
                   </div>
-                </div>
+                </button>
               );
 
               return (

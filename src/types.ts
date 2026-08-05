@@ -1,4 +1,4 @@
-export type EventStatus = 'selesai' | 'mendatang';
+export type EventStatus = 'selesai' | 'berlangsung' | 'mendatang';
 
 export interface PhotoDocumentation {
   id: string;
@@ -16,6 +16,7 @@ export interface TimelineEvent {
   dateIso: string;
   time: string;
   timeStart: string;
+  timeEnd?: string;
   location: string;
   category: 'Pra-Acara' | 'Lomba' | 'Religi/Budaya' | 'Puncak Acara';
   emoji: string;
@@ -27,6 +28,8 @@ export interface TimelineEvent {
   isKidFriendly?: boolean;
   rules?: string[];
   prizes?: string[];
+  picName?: string;
+  picPhone?: string;
   status?: 'Pendaftaran Dibuka' | 'Segera' | 'Selesai';
 }
 

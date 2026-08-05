@@ -48,9 +48,10 @@ export const RingkasanLomba: React.FC<RingkasanLombaProps> = ({ lombaList, setAc
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {shown.map((lomba, index) => (
-            <div
+            <button
+              type="button"
               key={lomba.id}
-              className={`${lomba.bgColor} border-4 border-black rounded-3xl p-5 shadow-[7px_7px_0px_#000] hover:shadow-[4px_4px_0px_#000] hover:-translate-y-1.5 transition-all cursor-pointer relative overflow-hidden ${ROTATION_CLASSES[index % ROTATION_CLASSES.length]}`}
+              className={`${lomba.bgColor} border-4 border-black rounded-3xl p-5 shadow-[7px_7px_0px_#000] hover:shadow-[4px_4px_0px_#000] hover:-translate-y-1.5 transition-all cursor-pointer relative overflow-hidden text-left ${ROTATION_CLASSES[index % ROTATION_CLASSES.length]}`}
               onClick={() => onOpenEventDetail(lomba)}
             >
               {/* Corner badge */}
@@ -91,7 +92,7 @@ export const RingkasanLomba: React.FC<RingkasanLombaProps> = ({ lombaList, setAc
                   {lomba.registeredCount} peserta{lomba.maxParticipants ? ` / ${lomba.maxParticipants}` : ''}
                 </span>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>
