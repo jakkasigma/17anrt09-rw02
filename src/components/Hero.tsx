@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Trophy, MessageSquareHeart, Compass, Sparkles, Heart, Users, ShieldCheck } from 'lucide-react';
+import { Calendar, Trophy, Compass, Sparkles, Heart, Users, ShieldCheck, Megaphone } from 'lucide-react';
 import { triggerMerdekaConfetti } from '../utils/confetti';
 
 interface HeroProps {
   setActiveTab: (tab: string) => void;
+  stats: { nodes: number; lomba: number };
 }
 
-export const Hero: React.FC<HeroProps> = ({ setActiveTab }) => {
+export const Hero: React.FC<HeroProps> = ({ setActiveTab, stats }) => {
   // Countdown to 17 August 2026
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -88,6 +89,14 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab }) => {
                 Selamat datang di portal resmi kegiatan perayaan HUT RI ke-81 warga Ngadisuryan RT 09. Ikuti keseruan peta jalan acara, jadwal lomba anak & keluarga, serta kirim pesan semangat!
               </p>
 
+              {/* Ajakan Semarak dari Pak RT */}
+              <div className="bg-black/20 border-2 border-white/80 rounded-2xl px-4 py-3 flex items-start gap-2">
+                <Megaphone className="w-5 h-5 text-yellow-300 shrink-0 mt-0.5 animate-bounce" />
+                <p className="text-white font-black text-sm sm:text-base leading-snug">
+                  Ajak anak cucu cicit ikut lomba-lomba — hanya setahun sekali, pokoknya meriahkan! 🇮🇩
+                </p>
+              </div>
+
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-3 pt-2">
                 <button
@@ -107,17 +116,6 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab }) => {
                 >
                   <Trophy className="w-5 h-5 text-amber-500" />
                   <span>Daftar Lomba</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    const el = document.getElementById('papan-ucapan');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="bg-black hover:bg-stone-900 text-white font-black text-base px-5 py-3.5 rounded-2xl border-3 border-black shadow-[5px_5px_0px_#000] hover:shadow-[2px_2px_0px_#000] hover:translate-x-1 hover:translate-y-1 transition-all cursor-pointer flex items-center gap-2"
-                >
-                  <MessageSquareHeart className="w-5 h-5 text-red-500" />
-                  <span>Kirim Sorakan</span>
                 </button>
               </div>
             </div>
@@ -166,7 +164,7 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab }) => {
               🗺️
             </div>
             <div>
-              <span className="block font-black text-2xl text-black">11 Node</span>
+              <span className="block font-black text-2xl text-black">{stats.nodes} Node</span>
               <span className="text-xs font-extrabold text-stone-700">Peta Acara Ceria</span>
             </div>
           </div>
@@ -176,7 +174,7 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab }) => {
               🏆
             </div>
             <div>
-              <span className="block font-black text-2xl text-black">9 Lomba</span>
+              <span className="block font-black text-2xl text-black">{stats.lomba} Lomba</span>
               <span className="text-xs font-extrabold text-stone-700">Anak & Dewasa</span>
             </div>
           </div>

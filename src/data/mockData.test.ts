@@ -27,10 +27,9 @@ describe('mockData consistency', () => {
     }
   });
 
-  it('all photos have unique ids and every event has at least one photo', () => {
+  it('all photos have unique ids (events may have none yet)', () => {
     const ids = INITIAL_EVENTS.flatMap((e) => e.photos.map((p) => p.id));
     expect(new Set(ids).size).toBe(ids.length);
-    expect(INITIAL_EVENTS.every((e) => e.photos.length > 0)).toBe(true);
   });
 
   it('every lomba has a registration status and registered count', () => {

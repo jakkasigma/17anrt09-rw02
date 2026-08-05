@@ -76,7 +76,7 @@ export const Galeri: React.FC<GaleriProps> = ({ events, onOpenPhoto }) => {
                         alt={photo.caption || 'Dokumentasi kegiatan RT 09'}
                         loading="lazy"
                         referrerPolicy="no-referrer"
-                        className="w-full h-auto block"
+                        className="w-full h-40 sm:h-56 object-cover block"
                       />
                       <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
                         <Eye className="w-6 h-6" />

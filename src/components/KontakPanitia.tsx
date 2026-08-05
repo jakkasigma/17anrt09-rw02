@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { PhoneCall, MapPin, MessageSquare, CheckCircle2, ShieldCheck, HelpCircle } from 'lucide-react';
+import { PhoneCall, MapPin, MessageSquare, CheckCircle2, ShieldCheck, ExternalLink } from 'lucide-react';
+import { COMMITTEE, WA_SEKRETARIAT, MAP_COORDINATES, MAP_LINK } from '../data/committee';
 import { triggerMerdekaConfetti } from '../utils/confetti';
 
 export const KontakPanitia: React.FC = () => {
@@ -7,59 +8,41 @@ export const KontakPanitia: React.FC = () => {
   const [senderMsg, setSenderMsg] = useState('');
   const [sent, setSent] = useState(false);
 
-  const committee = [
+  const infoPenting = [
     {
-      role: 'Ketua RT 09',
-      name: 'Bapak H. Budi Santoso',
-      phone: '0812-3456-7890',
-      address: 'Rumah No. 12',
-      emoji: '👨‍💼',
-      bgColor: 'bg-amber-200'
+      emoji: '🏃',
+      title: 'Daftar Lomba On The Spot',
+      desc: 'Pendaftaran lomba dilakukan langsung di tempat saat lomba berlangsung di Area RT 09.',
+      accent: 'bg-amber-200 border-amber-500'
     },
     {
-      role: 'Ketua Panitia HUT RI 81',
-      name: 'Mas Rizky Farhan (Karang Taruna)',
-      phone: '0813-9876-5432',
-      address: 'Rumah No. 18',
-      emoji: '🙋‍♂️',
-      bgColor: 'bg-emerald-200'
+      emoji: '🍚',
+      title: 'Tasyakuran Bawa Snack',
+      desc: 'Malam Tasyakuran 16 Agustus 2026, setiap KK membawa snack minimal @Rp5.000 sesuai kemampuan.',
+      accent: 'bg-rose-200 border-rose-500'
     },
     {
-      role: 'Bendahara Acara',
-      name: 'Ibu Hj. Endang Rahayu',
-      phone: '0811-2233-4455',
-      address: 'Rumah No. 05',
-      emoji: '👩‍💼',
-      bgColor: 'bg-rose-200'
+      emoji: '🗺️',
+      title: 'Lokasi Acara',
+      desc: 'Semua kegiatan di Area RT 09 Ngadisuryan. Lihat peta atau buka Google Maps di bawah.',
+      accent: 'bg-sky-200 border-sky-500'
     },
     {
-      role: 'Koordinator Lomba Anak',
-      name: 'Mba Alya & Kak Doni',
-      phone: '0857-1122-3344',
-      address: 'Rumah No. 04',
-      emoji: '🎈',
-      bgColor: 'bg-sky-200'
-    }
-  ];
-
-  const faqs = [
-    {
-      q: 'Bagaimana cara mendaftar Lomba 17-an?',
-      a: 'Warga dapat mendaftar langsung secara online melalui menu "Jadwal Lomba" di website ini atau menghubungi Panitia Karang Taruna di Pos Ronda.'
-    },
-    {
-      q: 'Siapa saja yang boleh mengikuti perlombaan?',
-      a: 'Seluruh warga RT 09 Ngadisuryan (Anak-anak, Remaja, Bapak-bapak, dan Ibu-ibu) diperbolehkan berpartisipasi gratis tanpa dipungut biaya!'
-    },
-    {
-      q: 'Kapan dan di mana Malam Puncak Tasyakuran diadakan?',
-      a: 'Malam Tasyakuran dilaksanakan pada Minggu, 16 Agustus 2026 mulai jam 19.30 WIB di Pos Ronda / Area Fasilitas Umum RT 09.'
+      emoji: '💬',
+      title: 'Butuh Bantuan?',
+      desc: 'Hubungi kontak person di bawah atau kirim pesan langsung via WhatsApp.',
+      accent: 'bg-emerald-200 border-emerald-500'
     }
   ];
 
   const handleSendToPanitia = (e: React.FormEvent) => {
     e.preventDefault();
     if (!senderName || !senderMsg) return;
+
+    const text = encodeURIComponent(
+      `Halo Panitia HUT RI ke-81 RT 09 Ngadisuryan,\nSaya: ${senderName}\n\n${senderMsg}`
+    );
+    window.open(`https://wa.me/${WA_SEKRETARIAT}?text=${text}`, '_blank');
 
     triggerMerdekaConfetti();
     setSent(true);
@@ -71,7 +54,7 @@ export const KontakPanitia: React.FC = () => {
   };
 
   return (
-    <section className="py-12 bg-stone-50 border-b-4 border-black min-h-screen">
+    <section className="py-12 bg-stone-50 border-b-4 border-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
         {/* Header */}
@@ -90,9 +73,31 @@ export const KontakPanitia: React.FC = () => {
           </p>
         </div>
 
+        {/* INFO PENTING STRIP */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {infoPenting.map((info, idx) => (
+            <div
+              key={idx}
+              className={`bg-white border-3 border-black rounded-2xl p-4 shadow-[5px_5px_0px_#000] flex items-start gap-3 hover:-translate-y-1 transition-all ${info.accent.split(' ')[1]}`}
+            >
+              <div className={`text-2xl p-1.5 rounded-xl border-2 border-black shadow-[2px_2px_0px_#000] ${info.accent.split(' ')[0]}`}>
+                {info.emoji}
+              </div>
+              <div>
+                <h4 className="font-black text-black text-sm leading-tight">
+                  {info.title}
+                </h4>
+                <p className="text-[11px] font-bold text-stone-700 leading-relaxed mt-1">
+                  {info.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
         {/* COMMITTEE CARDS GRID */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {committee.map((item, idx) => (
+          {COMMITTEE.map((item, idx) => (
             <div
               key={idx}
               className={`${item.bgColor} border-4 border-black rounded-3xl p-6 shadow-[6px_6px_0px_#000] space-y-3 hover:-translate-y-1 transition-all`}
@@ -119,6 +124,16 @@ export const KontakPanitia: React.FC = () => {
                   <span>{item.address}</span>
                 </div>
               </div>
+
+              <a
+                href={`https://wa.me/${item.waNumber}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 bg-black hover:bg-stone-800 text-white text-[11px] font-black px-3 py-1.5 rounded-lg border border-black shadow-[2px_2px_0px_#000] transition-all"
+              >
+                <MessageSquare className="w-3.5 h-3.5 text-emerald-300" />
+                Chat WhatsApp
+              </a>
             </div>
           ))}
         </div>
@@ -140,19 +155,30 @@ export const KontakPanitia: React.FC = () => {
                 Pos Ronda Utama RT 09, Ngadisuryan. Menjadi pusat informasi sekaligus titik kumpul seluruh kegiatan warga.
               </p>
 
-              {/* Map Illustration Placeholder Neubrutalism */}
-              <div className="bg-sky-100 border-3 border-black rounded-2xl p-6 shadow-[4px_4px_0px_#000] text-center space-y-3 mb-4">
-                <div className="text-5xl">🗺️📍</div>
-                <span className="font-black text-black text-base block">
-                  Peta Wilayah RT 09 Ngadisuryan
-                </span>
-                <p className="text-xs font-bold text-stone-600">
-                  Seluruh Area Wilayah RT 09 Ngadisuryan
-                </p>
+              {/* Google Maps Embed */}
+              <div className="bg-stone-100 border-3 border-black rounded-2xl p-2 shadow-[4px_4px_0px_#000] mb-4">
+                <iframe
+                  title="Peta Lokasi RT 09 Ngadisuryan"
+                  src={`https://www.google.com/maps?q=${MAP_COORDINATES.lat},${MAP_COORDINATES.lng}&z=16&output=embed`}
+                  className="w-full h-64 sm:h-72 border-2 border-black rounded-xl"
+                  loading="lazy"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
               </div>
+
+              <a
+                href={MAP_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-amber-300 hover:bg-amber-400 text-black text-xs font-black px-4 py-2 rounded-xl border-2 border-black shadow-[3px_3px_0px_#000] hover:shadow-[2px_2px_0px_#000] transition-all"
+              >
+                <ExternalLink className="w-4 h-4 text-red-600" />
+                Buka Lokasi di Google Maps
+              </a>
             </div>
 
-            <div className="bg-amber-100 border-2 border-black rounded-2xl p-4 text-xs font-bold text-stone-800 flex items-center gap-2">
+            <div className="mt-4 bg-amber-100 border-2 border-black rounded-2xl p-4 text-xs font-bold text-stone-800 flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-emerald-700 shrink-0" />
               <span>Pos Ronda Buka 24 Jam untuk Kemanan & Pusat Informasi Warga</span>
             </div>
@@ -167,14 +193,19 @@ export const KontakPanitia: React.FC = () => {
               </h3>
             </div>
 
+            <div className="bg-white/60 border-2 border-black rounded-xl px-3.5 py-2 text-[11px] font-black text-stone-700 flex items-center gap-2 mb-4">
+              <span className="text-base">💬</span>
+              Pesan akan terkirim langsung ke WhatsApp Panitia ({WA_SEKRETARIAT})
+            </div>
+
             {sent ? (
               <div className="bg-emerald-100 border-3 border-black rounded-2xl p-6 text-center space-y-3 my-8">
                 <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto animate-bounce" />
                 <h4 className="text-xl font-black text-black">
-                  Pesan Terkirim!
+                  WhatsApp Terbuka!
                 </h4>
                 <p className="text-xs font-bold text-stone-700">
-                  Terima kasih <span className="underline">{senderName}</span>, panitia akan segera merespons pertanyaanmu.
+                  Pesan dari <span className="underline">{senderName}</span> sudah disiapkan di WhatsApp. Tinggal tekan kirim!
                 </p>
               </div>
             ) : (
@@ -209,38 +240,15 @@ export const KontakPanitia: React.FC = () => {
 
                 <button
                   type="submit"
-                  className="w-full bg-red-500 hover:bg-red-600 text-white font-black text-sm py-3 rounded-2xl border-3 border-black shadow-[4px_4px_0px_#000] hover:shadow-[2px_2px_0px_#000] hover:translate-x-0.5 hover:translate-y-0.5 transition-all cursor-pointer"
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black text-sm py-3 rounded-2xl border-3 border-black shadow-[4px_4px_0px_#000] hover:shadow-[2px_2px_0px_#000] hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  Kirim Pesan Ke Panitia
+                  <MessageSquare className="w-4 h-4" />
+                  Kirim via WhatsApp
                 </button>
               </form>
             )}
           </div>
 
-        </div>
-
-        {/* FAQ SECTION */}
-        <div className="bg-white border-4 border-black rounded-3xl p-6 sm:p-8 shadow-[8px_8px_0px_#000]">
-          <div className="flex items-center gap-2 mb-6 pb-3 border-b-2 border-black">
-            <HelpCircle className="w-6 h-6 text-amber-500" />
-            <h3 className="text-2xl font-black text-black">
-              Tanya Jawab Seputar Acara (FAQ)
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {faqs.map((f, i) => (
-              <div key={i} className="bg-stone-50 border-3 border-black rounded-2xl p-4 shadow-[4px_4px_0px_#000]">
-                <h4 className="font-black text-black text-sm mb-2 flex items-start gap-1.5">
-                  <span className="text-red-600">Q:</span>
-                  <span>{f.q}</span>
-                </h4>
-                <p className="text-xs font-bold text-stone-700 leading-relaxed">
-                  <span className="text-emerald-700 font-black">A:</span> {f.a}
-                </p>
-              </div>
-            ))}
-          </div>
         </div>
 
       </div>

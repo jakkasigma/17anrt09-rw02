@@ -1,28 +1,37 @@
 import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
+import { PapanPengumuman } from './components/PapanPengumuman';
+import { AcaraBerikutnya } from './components/AcaraBerikutnya';
+import { FotoKilas } from './components/FotoKilas';
+import { RingkasanLomba } from './components/RingkasanLomba';
+import { KontakSingkat } from './components/KontakSingkat';
 import { TimelineMap } from './components/TimelineMap';
 import { JadwalLomba } from './components/JadwalLomba';
-import { PapanUcapan } from './components/PapanUcapan';
 import { KontakPanitia } from './components/KontakPanitia';
 import { Galeri } from './components/Galeri';
 import { GaleriModal } from './components/GaleriModal';
-import { EventDetailModal } from './components/EventDetailModal';
+import { EventDetailPage } from './components/EventDetailPage';
 import { Footer } from './components/Footer';
 
-import { INITIAL_EVENTS, INITIAL_LOMBA, INITIAL_WISHES } from './data/mockData';
-import { TimelineEvent, LombaItem, ResidentWish, PhotoDocumentation } from './types';
+import { INITIAL_EVENTS, INITIAL_LOMBA, INITIAL_PENGUMUMAN } from './data/mockData';
+import { TimelineEvent, LombaItem, PhotoDocumentation, Announcement } from './types';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('beranda');
   const [events] = useState<TimelineEvent[]>(INITIAL_EVENTS);
   const [lombaList] = useState<LombaItem[]>(INITIAL_LOMBA);
-  const [wishes, setWishes] = useState<ResidentWish[]>(INITIAL_WISHES);
+  const [announcements] = useState<Announcement[]>(INITIAL_PENGUMUMAN);
 
   // Modal States
   const [currentPhoto, setCurrentPhoto] = useState<PhotoDocumentation | null>(null);
   const [activePhotoList, setActivePhotoList] = useState<PhotoDocumentation[]>([]);
   const [selectedDetailEvent, setSelectedDetailEvent] = useState<TimelineEvent | null>(null);
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setSelectedDetailEvent(null);
+  };
 
   // Photo Lightbox handlers
   const handleOpenPhoto = (photo: PhotoDocumentation, allPhotos: PhotoDocumentation[]) => {
@@ -47,74 +56,77 @@ export default function App() {
     }
   };
 
-  // Add Wish Handler
-  const handleAddWish = (newWish: Omit<ResidentWish, 'id' | 'timestamp' | 'likes'>) => {
-    const createdWish: ResidentWish = {
-      ...newWish,
-      id: `w-${Date.now()}`,
-      timestamp: 'Baru saja',
-      likes: 1
-    };
-    setWishes([createdWish, ...wishes]);
-  };
-
   return (
     <div className="min-h-screen bg-[#fafaf9] text-stone-900 font-sans antialiased selection:bg-amber-300 selection:text-black">
       
       {/* Top Neubrutalism Sticky Navbar */}
-      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Navbar activeTab={activeTab} setActiveTab={handleTabChange} />
 
       {/* Main Tab Render */}
       <main>
-        {activeTab === 'beranda' && (
+        {selectedDetailEvent && (
+          <EventDetailPage
+            event={selectedDetailEvent}
+            onBack={() => setSelectedDetailEvent(null)}
+            onOpenPhoto={handleOpenPhoto}
+          />
+        )}
+
+        {!selectedDetailEvent && activeTab === 'beranda' && (
           <>
-            <Hero setActiveTab={setActiveTab} />
-            <TimelineMap
-              events={events}
-              onOpenPhoto={handleOpenPhoto}
-              onOpenEventDetail={setSelectedDetailEvent}
+            <Hero setActiveTab={handleTabChange} stats={{ nodes: events.length, lomba: lombaList.length }} />
+            <PapanPengumuman announcements={announcements} />
+            <AcaraBerikutnya events={events} onOpenEventDetail={setSelectedDetailEvent} />
+            <FotoKilas events={events} onOpenPhoto={handleOpenPhoto} setActiveTab={handleTabChange} />
+            <RingkasanLomba
+              lombaList={lombaList}
+              setActiveTab={handleTabChange}
+              onOpenEventDetail={(lomba) => {
+                const evt = events.find((e) => e.id === lomba.id);
+                if (evt) setSelectedDetailEvent(evt);
+              }}
             />
-            <JadwalLomba lombaList={lombaList} />
-            <PapanUcapan wishes={wishes} onAddWish={handleAddWish} />
-            <KontakPanitia />
+            <KontakSingkat setActiveTab={handleTabChange} />
           </>
         )}
 
-        {activeTab === 'timeline' && (
+        {!selectedDetailEvent && activeTab === 'timeline' && (
           <div className="pt-4">
             <TimelineMap
               events={events}
               onOpenPhoto={handleOpenPhoto}
               onOpenEventDetail={setSelectedDetailEvent}
             />
-            <PapanUcapan wishes={wishes} onAddWish={handleAddWish} />
           </div>
         )}
 
-        {activeTab === 'lomba' && (
+        {!selectedDetailEvent && activeTab === 'lomba' && (
           <div className="pt-4">
-            <JadwalLomba lombaList={lombaList} />
-            <PapanUcapan wishes={wishes} onAddWish={handleAddWish} />
+            <JadwalLomba
+              lombaList={lombaList}
+              onOpenDetail={(lomba) => {
+                const evt = events.find((e) => e.id === lomba.id);
+                if (evt) setSelectedDetailEvent(evt);
+              }}
+            />
           </div>
         )}
 
-        {activeTab === 'galeri' && (
+        {!selectedDetailEvent && activeTab === 'galeri' && (
           <div className="pt-4">
             <Galeri events={events} onOpenPhoto={handleOpenPhoto} />
-            <PapanUcapan wishes={wishes} onAddWish={handleAddWish} />
           </div>
         )}
 
-        {activeTab === 'kontak' && (
+        {!selectedDetailEvent && activeTab === 'kontak' && (
           <div className="pt-4">
             <KontakPanitia />
-            <PapanUcapan wishes={wishes} onAddWish={handleAddWish} />
           </div>
         )}
       </main>
 
       {/* Neubrutalism Footer */}
-      <Footer setActiveTab={setActiveTab} />
+      <Footer setActiveTab={handleTabChange} />
 
       {/* Lightbox Photo Modal */}
       <GaleriModal
@@ -122,13 +134,6 @@ export default function App() {
         allPhotos={activePhotoList}
         onClose={handleClosePhoto}
         onNavigate={handleNavigatePhoto}
-      />
-
-      {/* Event Detail Modal */}
-      <EventDetailModal
-        event={selectedDetailEvent}
-        onClose={() => setSelectedDetailEvent(null)}
-        onOpenPhoto={handleOpenPhoto}
       />
 
     </div>

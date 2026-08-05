@@ -12,10 +12,10 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
 
   const navItems = [
     { id: 'beranda', label: 'Beranda', icon: Flag },
-    { id: 'timeline', label: 'Timeline Peta Acara', icon: Calendar, badge: 'Utama' },
-    { id: 'lomba', label: 'Jadwal Lomba', icon: Trophy, badge: '17-an' },
-    { id: 'galeri', label: 'Galeri Foto', icon: Images },
-    { id: 'kontak', label: 'Kontak & Info RT', icon: PhoneCall },
+    { id: 'timeline', label: 'Timeline', icon: Calendar },
+    { id: 'lomba', label: 'Jadwal Lomba', icon: Trophy },
+    { id: 'galeri', label: 'Galeri', icon: Images },
+    { id: 'kontak', label: 'Kontak', icon: PhoneCall },
   ];
 
   const handleNavClick = (id: string) => {
@@ -69,13 +69,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                 >
                   <Icon className={`w-4 h-4 ${isActive ? 'text-red-600' : 'text-stone-600'}`} />
                   {item.label}
-                  {item.badge && (
-                    <span className={`text-[10px] font-black px-1.5 py-0.2 rounded-md border border-black ${
-                      isActive ? 'bg-red-500 text-white' : 'bg-red-100 text-red-700'
-                    }`}>
-                      {item.badge}
-                    </span>
-                  )}
                 </button>
               );
             })}
@@ -134,11 +127,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                   </div>
                   <span>{item.label}</span>
                 </div>
-                {item.badge && (
-                  <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full border border-black font-black">
-                    {item.badge}
-                  </span>
-                )}
               </button>
             );
           })}

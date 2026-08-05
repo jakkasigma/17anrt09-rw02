@@ -25,6 +25,9 @@ export interface TimelineEvent {
   highlights: string[];
   photos: PhotoDocumentation[];
   isKidFriendly?: boolean;
+  rules?: string[];
+  prizes?: string[];
+  status?: 'Pendaftaran Dibuka' | 'Segera' | 'Selesai';
 }
 
 export interface LombaItem {
@@ -45,12 +48,14 @@ export interface LombaItem {
   status: 'Pendaftaran Dibuka' | 'Segera' | 'Selesai';
 }
 
-export interface ResidentWish {
+export type AnnouncementTag = 'Penting' | 'Info' | 'Pengumuman';
+
+export interface Announcement {
   id: string;
-  name: string;
-  houseNumber: string;
+  title: string;
   message: string;
-  sticker: string;
-  timestamp: string;
-  likes: number;
+  date: string;
+  tag: AnnouncementTag;
+  emoji: string;
+  pinned?: boolean;
 }

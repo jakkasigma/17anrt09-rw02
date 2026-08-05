@@ -6,9 +6,8 @@ Website interaktif perayaan HUT RI ke-81 warga Ngadisuryan RT 09. Dibangun denga
 
 - **Peta Acara** - timeline bergaya peta harta karun dengan marker posisi "kita di sini" yang diperbarui otomatis, filter status, dan kartu detail per acara
 - **Jadwal Lomba** - papan pengumuman lomba anak & umum dengan detail, aturan, hadiah, dan kontak PIC
-- **Papan Ucapan** - warga mengirim ucapan & doa kemerdekaan
 - **Galeri Dokumentasi** - lightbox foto seluruh kegiatan
-- **Kontak Panitia** - kartu pengurus, info sekretariat, dan FAQ
+- **Kontak Panitia** - kartu pengurus, info sekretariat, pesan ke panitia via WhatsApp, dan FAQ
 - **Deploy otomatis** ke GitHub Pages via GitHub Actions
 
 ## Menjalankan Lokal
@@ -38,4 +37,4 @@ src/
 public/         - favicon
 ```
 
-Catatan: situs ini statis. Data ucapan & pendaftaran tersimpan di state aplikasi dan akan hilang saat halaman dimuat ulang.
+Catatan: situs ini statis tanpa backend. Pesan ke panitia dikirim langsung via WhatsApp.

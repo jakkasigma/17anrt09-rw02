@@ -70,7 +70,7 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
             </button>
             <span>•</span>
             <button onClick={() => setActiveTab('timeline')} className="hover:underline cursor-pointer">
-              Timeline Peta Acara
+              Timeline
             </button>
             <span>•</span>
             <button onClick={() => setActiveTab('lomba')} className="hover:underline cursor-pointer">
@@ -78,11 +78,11 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
             </button>
             <span>•</span>
             <button onClick={() => setActiveTab('galeri')} className="hover:underline cursor-pointer">
-              Galeri Foto
+              Galeri
             </button>
             <span>•</span>
             <button onClick={() => setActiveTab('kontak')} className="hover:underline cursor-pointer">
-              Kontak RT
+              Kontak
             </button>
           </div>
         </div>

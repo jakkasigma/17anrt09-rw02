@@ -1,4 +1,4 @@
-import { TimelineEvent, LombaItem, ResidentWish, PhotoDocumentation } from '../types';
+import { TimelineEvent, LombaItem, PhotoDocumentation, Announcement } from '../types';
 
 interface LombaMaster extends LombaItem {
   stepNumber: number;
@@ -12,42 +12,31 @@ interface LombaMaster extends LombaItem {
   isKidFriendly?: boolean;
 }
 
-export const INITIAL_WISHES: ResidentWish[] = [
+export const INITIAL_PENGUMUMAN: Announcement[] = [
   {
-    id: 'w-1',
-    name: 'Keluarga Pak Herman',
-    houseNumber: 'Rumah No. 12',
-    message: 'Dirgahayu Republik Indonesia ke-81! Bangga jadi warga RT 09 Ngadisuryan yang selalu kompak dan rukun. Merdeka!! 🇮🇩✨',
-    sticker: '🇮🇩',
-    timestamp: '2 jam yang lalu',
-    likes: 12
+    id: 'a-1',
+    title: 'Malam Sarasehan & Tasyakuran 16 Agustus',
+    message: 'Wajib membawa snack masing-masing per KK (minimal senilai @Rp5.000, boleh lebih sesuai kemampuan panjenengan).',
+    date: '5 Agustus 2026',
+    tag: 'Penting',
+    emoji: '🍚',
+    pinned: true
   },
   {
-    id: 'w-2',
-    name: 'Kak Alya & Adik Dito',
-    houseNumber: 'Rumah No. 04',
-    message: 'Nggak sabar ikutan Lomba Pukul Air besok sore! Udah siap basah-basahan nih 🎈💦',
-    sticker: '🎈',
-    timestamp: '4 jam yang lalu',
-    likes: 9
+    id: 'a-2',
+    title: 'Jalan Sehat CarNavaL',
+    message: 'Akan diagendakan Jalan Sehat CarNavaL, kostum bebas (lucu, sport, badut), kritik membangun monggo. Pokoknya meriah! Viral 🙏',
+    date: '5 Agustus 2026',
+    tag: 'Info',
+    emoji: '🎉'
   },
   {
-    id: 'w-3',
-    name: 'Bu Hajah Nunung',
-    houseNumber: 'Rumah No. 25',
-    message: 'Semoga acara HUT RI ke-81 RT 09 lancar, berkah, dan makin mempererat tali silaturahmi antar tetangga. Bravo Panitia!',
-    sticker: '👏',
-    timestamp: 'Kemarin',
-    likes: 18
-  },
-  {
-    id: 'w-4',
-    name: 'Mas Farhan (Karang Taruna)',
-    houseNumber: 'Rumah No. 18',
-    message: 'Jangan lupa hadir ya bapak ibu dan adik-adik di Malam Tasyakuran Potong Tumpeng tanggal 16 Agustus! Ada pembagian hadiah untuk semua juara lomba!',
-    sticker: '🍚',
-    timestamp: '2 hari lalu',
-    likes: 15
+    id: 'a-3',
+    title: 'Semarakkan 17-an Bersama Keluarga',
+    message: 'Mari kita semarakkan acara 17-an di warga RT 09! Ikuti & ramaikan, ajak anak cucu cicit mengikuti lomba-lomba. Hanya setahun sekali, pokoknya meriahkan.',
+    date: '5 Agustus 2026',
+    tag: 'Pengumuman',
+    emoji: '📢'
   }
 ];
 
@@ -104,13 +93,31 @@ const NON_LOMBA_EVENTS: TimelineEvent[] = [
         url: './foto-galeri/kerjabakti/719145.jpg',
         caption: '',
         photographer: 'Dokumentasi Panitia'
+      },
+      {
+        id: 'kb-7',
+        url: './foto-galeri/kerjabakti/kb-7.jpg',
+        caption: '',
+        photographer: 'Dokumentasi Panitia'
+      },
+      {
+        id: 'kb-8',
+        url: './foto-galeri/kerjabakti/kb-8.jpg',
+        caption: '',
+        photographer: 'Dokumentasi Panitia'
+      },
+      {
+        id: 'kb-9',
+        url: './foto-galeri/kerjabakti/kb-9.jpg',
+        caption: '',
+        photographer: 'Dokumentasi Panitia'
       }
     ],
     isKidFriendly: true
   },
   {
     id: 'evt-11',
-    stepNumber: 11,
+    stepNumber: 10,
     title: 'Malam Tasyakuran HUT RI ke-81',
     subtitle: 'Renungan, Doa Bersama, Potong Tumpeng & Pembagian Hadiah',
     date: 'Minggu, 16 Agustus 2026',
@@ -122,22 +129,9 @@ const NON_LOMBA_EVENTS: TimelineEvent[] = [
     emoji: '🍚✨',
     bgColor: 'bg-red-200',
     accentColor: 'border-red-700',
-    description: 'Puncak acara penutup rangkaian kemeriahan kemerdekaan. Panitia mengundang seluruh warga Ngadisuryan RT 09 hadir pada malam tasyakuran HUT RI ke-81 dengan susunan acara yang khidmat dan meriah.',
-    highlights: ['Pembukaan & Menyanyikan Lagu Indonesia Raya', 'Sambutan Ketua RT 09 & Ketua Panitia', 'Renungan Kemerdekaan & Doa Bersama', 'Pemotongan Tumpeng Simbolis Rasa Syukur', 'Pengumuman Pemenang & Pembagian Hadiah', 'Ramah Tamah & Hiburan'],
-    photos: [
-      {
-        id: 'p9',
-        url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80',
-        caption: 'Ilustrasi persiapan Tumpeng Merah Putih malam tasyakuran RT 09',
-        photographer: 'Panitia Tasyakuran'
-      },
-      {
-        id: 'p15',
-        url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80',
-        caption: 'Suasana kehangatan kumpul warga di malam tasyakuran',
-        photographer: 'Arsip RT 09'
-      }
-    ],
+    description: 'Puncak acara penutup rangkaian kemeriahan kemerdekaan. Panitia mengundang seluruh warga Ngadisuryan RT 09 hadir pada malam tasyakuran HUT RI ke-81 dengan susunan acara yang khidmat dan meriah. Sesuai pesan Pak RT, setiap KK wajib membawa snack masing-masing dengan nilai minimal @Rp5.000 (boleh lebih sesuai kemampuan) untuk dinikmati bersama.',
+    highlights: ['Pembukaan & Menyanyikan Lagu Indonesia Raya', 'Sambutan Ketua RT 09 & Ketua Panitia', 'Renungan Kemerdekaan & Doa Bersama', 'Pemotongan Tumpeng Simbolis Rasa Syukur', 'Pengumuman Pemenang & Pembagian Hadiah', 'Ramah Tamah & Hiburan', 'Bawa Snack Masing-masing/KK (minimal @Rp5.000)'],
+    photos: [],
     isKidFriendly: true
   }
 ];
@@ -156,7 +150,7 @@ const LOMBA_MASTER: LombaMaster[] = [
     timeStart: '16:00',
     location: 'Area RT 09',
     picName: 'Kak Rizky',
-    picPhone: '0812-3456-7890',
+    picPhone: '0878-1710-9749',
     registeredCount: 14,
     maxParticipants: 20,
     prizes: ['Trofi Juara 1 + Set Alat Tulis', 'Trofi Juara 2 + Tas Sekolah', 'Trofi Juara 3 + Botol Minum'],
@@ -166,14 +160,7 @@ const LOMBA_MASTER: LombaMaster[] = [
     status: 'Pendaftaran Dibuka',
     description: 'Lomba makan kerupuk khusus anak-anak sebagai pembuka rangkaian lomba kemerdekaan. Siapa paling cepat menghabiskan kerupuk jumbo tanpa bantuan tangan, dialah juaranya!',
     highlights: ['Kategori usia 4 - 10 tahun', 'Tangan wajib diikat ke belakang', 'Paling cepat jadi pemenang'],
-    photos: [
-      {
-        id: 'p4',
-        url: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80',
-        caption: 'Anak-anak riang gembira mengikuti lomba makan kerupuk RT 09',
-        photographer: 'Karang Taruna'
-      }
-    ],
+    photos: [],
     isKidFriendly: true
   },
   {
@@ -189,7 +176,7 @@ const LOMBA_MASTER: LombaMaster[] = [
     timeStart: '19:00',
     location: 'Area RT 09',
     picName: 'Kak Rizky',
-    picPhone: '0812-3456-7890',
+    picPhone: '0878-1710-9749',
     registeredCount: 12,
     maxParticipants: 20,
     prizes: ['Piala Juara 1 + Paket Alat Tulis', 'Piala Juara 2 + Buku Gambar', 'Piala Juara 3 + Set Mewarnai'],
@@ -199,14 +186,7 @@ const LOMBA_MASTER: LombaMaster[] = [
     status: 'Pendaftaran Dibuka',
     description: 'Lomba seru memasukkan pensil yang digantung di belakang ke dalam botol. Butuh fokus, keseimbangan, dan ketelitian untuk jadi juara!',
     highlights: ['Kategori usia 4 - 10 tahun', 'Pensil digantung tali di belakang', 'Tidak boleh menggunakan tangan untuk membantu'],
-    photos: [
-      {
-        id: 'p5',
-        url: 'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=800&q=80',
-        caption: 'Keseruan anak-anak RT 09 dalam lomba ketangkasan',
-        photographer: 'Panitia Lomba'
-      }
-    ],
+    photos: [],
     isKidFriendly: true
   },
   {
@@ -222,7 +202,7 @@ const LOMBA_MASTER: LombaMaster[] = [
     timeStart: '16:00',
     location: 'Area RT 09',
     picName: 'Mba Sinta',
-    picPhone: '0813-9876-5432',
+    picPhone: '0878-1710-9749',
     registeredCount: 15,
     maxParticipants: 24,
     prizes: ['Trofi Juara 1 + Sepatu Roda', 'Trofi Juara 2 + Helm Lucu', 'Trofi Juara 3 + Botol Minum Tumbler'],
@@ -232,14 +212,7 @@ const LOMBA_MASTER: LombaMaster[] = [
     status: 'Pendaftaran Dibuka',
     description: 'Lomba memukul balon air dengan mata tertutup. Pecahnya balon air jadi penanda kemenangan sekaligus momen basah-basahan yang menghibur!',
     highlights: ['Kategori usia 6 - 12 tahun', 'Mata ditutup kain saat memukul balon air', 'Dilarang membuka penutup mata sebelum aba-aba'],
-    photos: [
-      {
-        id: 'p6',
-        url: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&w=800&q=80',
-        caption: 'Momen seru lomba pukul air anak-anak RT 09',
-        photographer: 'Dokumentasi Panitia'
-      }
-    ],
+    photos: [],
     isKidFriendly: true
   },
   {
@@ -255,7 +228,7 @@ const LOMBA_MASTER: LombaMaster[] = [
     timeStart: '19:00',
     location: 'Area RT 09',
     picName: 'Mba Sinta',
-    picPhone: '0813-9876-5432',
+    picPhone: '0878-1710-9749',
     registeredCount: 13,
     maxParticipants: 20,
     prizes: ['Piala Juara 1 + Sepeda Mini', 'Piala Juara 2 + Sepatu Olahraga', 'Piala Juara 3 + Set Alat Tulis'],
@@ -265,14 +238,7 @@ const LOMBA_MASTER: LombaMaster[] = [
     status: 'Pendaftaran Dibuka',
     description: 'Lomba lari membawa kelereng di atas sendok. Kelereng tak boleh jatuh, siapa paling cepat sampai garis finish jadi pemenang!',
     highlights: ['Kategori usia 6 - 12 tahun', 'Kelereng di atas sendok tanpa boleh jatuh', 'Tercepat sampai garis finish jadi pemenang'],
-    photos: [
-      {
-        id: 'p7',
-        url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80',
-        caption: 'Sorak semangat menyaksikan lomba lari kelereng RT 09',
-        photographer: 'Karang Taruna'
-      }
-    ],
+    photos: [],
     isKidFriendly: true
   },
   {
@@ -288,7 +254,7 @@ const LOMBA_MASTER: LombaMaster[] = [
     timeStart: '08:00',
     location: 'Area RT 09',
     picName: 'Bu Sri',
-    picPhone: '0811-2233-4455',
+    picPhone: '0813-2510-6276',
     registeredCount: 28,
     maxParticipants: 50,
     prizes: ['Trofi Juara 1 + Peralatan Seni Komplit', 'Trofi Juara 2 + Set Crayon & Buku Gambar', 'Trofi Juara 3 + Kotak Pensil Warna'],
@@ -303,20 +269,7 @@ const LOMBA_MASTER: LombaMaster[] = [
     status: 'Pendaftaran Dibuka',
     description: 'Ajang kreativitas seni anak-anak! Lomba mewarnai untuk TK s.d. Kelas 3 SD dan lomba menggambar untuk Kelas 4 SD s.d. 1 SMP, dengan tema yang ditentukan panitia saat lomba.',
     highlights: ['Mewarnai: TK s.d. Kelas 3 SD', 'Menggambar: Kelas 4 SD s.d. 1 SMP', 'Peserta membawa peralatan sendiri'],
-    photos: [
-      {
-        id: 'p8',
-        url: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=800&q=80',
-        caption: 'Anak-anak TK & SD asyik mewarnai di RT 09',
-        photographer: 'Panitia Lomba'
-      },
-      {
-        id: 'p11',
-        url: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80',
-        caption: 'Persiapan anak-anak mengikuti lomba menggambar',
-        photographer: 'Dokumentasi Panitia'
-      }
-    ],
+    photos: [],
     isKidFriendly: true
   },
   {
@@ -332,7 +285,7 @@ const LOMBA_MASTER: LombaMaster[] = [
     timeStart: '16:00',
     location: 'Area RT 09',
     picName: 'Pak Yanto',
-    picPhone: '0857-1122-3344',
+    picPhone: '0813-2510-6276',
     registeredCount: 11,
     maxParticipants: 20,
     prizes: ['Trofi Juara 1 + Raket Pingpong', 'Trofi Juara 2 + Sepatu Olahraga', 'Trofi Juara 3 + Botol Minum'],
@@ -342,52 +295,12 @@ const LOMBA_MASTER: LombaMaster[] = [
     status: 'Pendaftaran Dibuka',
     description: 'Lomba meniup bola pingpong melewati deretan gelas berisi air. Butuh nafas panjang dan strategi agar bola cepat berpindah ke gelas terakhir!',
     highlights: ['Kategori usia 6 - 12 tahun', 'Bola pingpong ditiup melewati gelas berisi air', 'Tangan tidak boleh menyentuh gelas'],
-    photos: [
-      {
-        id: 'p12',
-        url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80',
-        caption: 'Ilustrasi suasana lomba tiup bola pingpong RT 09',
-        photographer: 'Panitia 17-an'
-      }
-    ],
+    photos: [],
     isKidFriendly: true
   },
   {
-    id: 'l-8',
-    stepNumber: 8,
-    title: 'Lomba Domino',
-    subtitle: 'Kategori Umum Warga - Malam Hari',
-    category: 'Umum',
-    emoji: '🎲',
-    date: 'Jumat, 14 Agustus 2026',
-    dateIso: '2026-08-14',
-    time: '19.00 WIB',
-    timeStart: '19:00',
-    location: 'Area RT 09',
-    picName: 'Pak Yanto',
-    picPhone: '0857-1122-3344',
-    registeredCount: 16,
-    maxParticipants: 32,
-    prizes: ['Hadiah Tunai Juara 1', 'Parcel Sembako Juara 2', 'Paket Snack Juara 3'],
-    rules: ['Kategori umum warga RT 09', 'Sistem gugur dengan undian', 'Keputusan juri panitia bersifat mutlak'],
-    bgColor: 'bg-stone-200',
-    accentColor: 'border-stone-600',
-    status: 'Pendaftaran Dibuka',
-    description: 'Lomba domino kategori umum warga RT 09 dengan sistem gugur berundian. Adrenalin dan strategi jadi kunci menuju puncak klasemen!',
-    highlights: ['Kategori umum warga RT 09', 'Sistem gugur dengan undian', 'Keputusan juri panitia bersifat mutlak'],
-    photos: [
-      {
-        id: 'p10',
-        url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80',
-        caption: 'Suasana seru lomba domino warga RT 09',
-        photographer: 'Arsip RT 09'
-      }
-    ],
-    isKidFriendly: false
-  },
-  {
     id: 'l-9',
-    stepNumber: 9,
+    stepNumber: 8,
     title: 'Estafet Air',
     subtitle: 'Kategori Umum - Kelompok Diacak Panitia',
     category: 'Umum',
@@ -398,7 +311,7 @@ const LOMBA_MASTER: LombaMaster[] = [
     timeStart: '16:00',
     location: 'Area RT 09',
     picName: 'Mba Wulan',
-    picPhone: '0818-5566-7788',
+    picPhone: '0813-2510-6276',
     registeredCount: 8,
     maxParticipants: 12,
     prizes: ['Hadiah Tunai + Parcel Raksasa Juara 1', 'Parcel Sembako Juara 2', 'Paket Snack Komplek Juara 3'],
@@ -408,19 +321,12 @@ const LOMBA_MASTER: LombaMaster[] = [
     status: 'Pendaftaran Dibuka',
     description: 'Lomba estafet air untuk umum. Kelompok peserta diacak langsung oleh panitia di tempat untuk menambah keseruan! Tim paling cepat dan paling sedikit menumpahkan air jadi juara.',
     highlights: ['Kelompok diacak panitia di tempat', 'Memindahkan air tanpa tumpah di garis finish', 'Waktu tercepat menentukan pemenang'],
-    photos: [
-      {
-        id: 'p13',
-        url: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80',
-        caption: 'Keseruan lomba estafet air warga RT 09',
-        photographer: 'Karang Taruna'
-      }
-    ],
+    photos: [],
     isKidFriendly: false
   },
   {
     id: 'l-10',
-    stepNumber: 10,
+    stepNumber: 9,
     title: 'Estafet Pakai Domino',
     subtitle: 'Kategori Umum Warga - Malam Hari',
     category: 'Umum',
@@ -431,7 +337,7 @@ const LOMBA_MASTER: LombaMaster[] = [
     timeStart: '19:00',
     location: 'Area RT 09',
     picName: 'Mba Wulan',
-    picPhone: '0818-5566-7788',
+    picPhone: '0813-2510-6276',
     registeredCount: 8,
     maxParticipants: 12,
     prizes: ['Hadiah Tunai + Parcel Raksasa Juara 1', 'Parcel Sembako Juara 2', 'Paket Snack Komplek Juara 3'],
@@ -441,15 +347,33 @@ const LOMBA_MASTER: LombaMaster[] = [
     status: 'Pendaftaran Dibuka',
     description: 'Lomba menyusun domino secara berjajar secara estafet untuk umum. Kompak dan cekatan tim jadi kunci agar susunan domino tidak roboh sebelum garis finish!',
     highlights: ['Kategori umum warga RT 09', 'Susun domino berjajar secara estafet', 'Jatuh sebelum garis finish dihitung ulang'],
-    photos: [
-      {
-        id: 'p14',
-        url: 'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=800&q=80',
-        caption: 'Ilustrasi lomba estafet domino warga RT 09',
-        photographer: 'Panitia 17-an'
-      }
-    ],
+    photos: [],
     isKidFriendly: false
+  },
+  {
+    id: 'l-11',
+    stepNumber: 11,
+    title: 'Jalan Sehat CarNavaL',
+    subtitle: 'Kostum Bebas & Karnaval Meriah',
+    category: 'Umum',
+    emoji: '🎉',
+    date: 'Minggu, 23 Agustus 2026',
+    dateIso: '2026-08-23',
+    time: '07.00 - 09.00 WIB',
+    timeStart: '07:00',
+    location: 'Start Pos Ronda / Area RT 09',
+    picName: 'Karang Taruna',
+    picPhone: '0813-2510-6276',
+    registeredCount: 0,
+    prizes: ['Hadiah Kostum Terfavorit', 'Hadiah Semangat Keluarga', 'Paket Snack Ceria'],
+    rules: ['Kostum bebas: lucu, sport, badut, tema kritis membangun, dll', 'Rute sepanjang area lingkungan RT 09', 'Kritik membangun dengan semangat meriah'],
+    bgColor: 'bg-fuchsia-100',
+    accentColor: 'border-fuchsia-600',
+    status: 'Segera',
+    description: 'Jalan Sehat CarNavaL warga RT 09 dengan kostum bebas sesuai kreativitas: lucu, sport, badut, hingga tema kritis membangun. Sesuai ajakan Pak RT, ajak seluruh keluarga anak cucu cicit, pokoknya meriah dan viral! 🙏',
+    highlights: ['Kostum bebas: lucu, sport, badut, kritis membangun', 'Ajak keluarga: anak cucu cicit', 'Karnaval meriah penuh semangat'],
+    photos: [],
+    isKidFriendly: true
   }
 ];
 
@@ -470,6 +394,9 @@ const toEvent = (l: LombaMaster): TimelineEvent => ({
   description: l.description,
   highlights: l.highlights,
   photos: l.photos,
+  rules: l.rules,
+  prizes: l.prizes,
+  status: l.status,
   ...(l.isKidFriendly !== undefined ? { isKidFriendly: l.isKidFriendly } : {})
 });
 
