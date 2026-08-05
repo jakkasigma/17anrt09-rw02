@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TimelineEvent, PhotoDocumentation } from '../types';
+import { getEventStatus } from '../utils/eventStatus';
 import { Calendar, MapPin, Clock, Camera, CheckCircle2, Hourglass, Filter, ChevronRight, Compass, Flag, MousePointerClick } from 'lucide-react';
 
 interface TimelineMapProps {
@@ -79,6 +80,17 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
   const nowMs = now.getTime();
   const todayIso = formatIso(now);
 
+  if (events.length === 0) {
+    return (
+      <section className="py-12 bg-[#fefae0] relative overflow-hidden border-b-4 border-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-3">
+          <h2 className="text-3xl sm:text-5xl font-black text-black tracking-tight">Peta Acara</h2>
+          <p className="text-stone-800 font-bold">Belum ada acara yang dijadwalkan.</p>
+        </div>
+      </section>
+    );
+  }
+
   let marker: { x: number; y: number };
   let markerIsToday = false;
 
@@ -108,8 +120,8 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
 
   // Filter events
   const filteredEvents = events.filter((evt) => {
-    if (filterStatus === 'selesai') return evt.status === 'selesai';
-    if (filterStatus === 'mendatang') return evt.status === 'mendatang';
+    if (filterStatus === 'selesai') return getEventStatus(evt.dateIso, evt.timeStart) === 'selesai';
+    if (filterStatus === 'mendatang') return getEventStatus(evt.dateIso, evt.timeStart) === 'mendatang';
     if (filterStatus === 'anak') return evt.isKidFriendly === true;
     return true;
   });
@@ -193,7 +205,7 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
               }`}
             >
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
-              <span>Selesai ({events.filter(e => e.status === 'selesai').length})</span>
+              <span>Selesai ({events.filter(e => getEventStatus(e.dateIso, e.timeStart) === 'selesai').length})</span>
             </button>
 
             <button
@@ -205,7 +217,7 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
               }`}
             >
               <Hourglass className="w-3.5 h-3.5 text-sky-700" />
-              <span>Mendatang ({events.filter(e => e.status === 'mendatang').length})</span>
+              <span>Mendatang ({events.filter(e => getEventStatus(e.dateIso, e.timeStart) === 'mendatang').length})</span>
             </button>
 
             <button
@@ -288,7 +300,7 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
           {/* EVENT CARDS - SAME LAYOUT ALL BREAKPOINTS */}
           <div className="space-y-6 lg:space-y-14 relative z-10">
             {filteredEvents.map((evt, index) => {
-              const isPast = evt.status === 'selesai';
+              const isPast = getEventStatus(evt.dateIso, evt.timeStart) === 'selesai';
               const isEven = index % 2 === 0;
               const rotationClass = getRotationAngle(index);
 

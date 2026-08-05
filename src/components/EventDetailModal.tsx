@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { TimelineEvent, PhotoDocumentation } from '../types';
-import { Calendar, Clock, MapPin, CheckCircle2, Hourglass, Camera, X, Sparkles, Share2, Eye } from 'lucide-react';
+import { getEventStatus } from '../utils/eventStatus';
+import { useModalA11y } from '../utils/useModalA11y';
+import { Calendar, Clock, MapPin, CheckCircle2, Hourglass, Camera, X, Sparkles, Eye } from 'lucide-react';
 import { triggerMerdekaConfetti } from '../utils/confetti';
 
 interface EventDetailModalProps {
@@ -14,13 +16,23 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
   onClose,
   onOpenPhoto,
 }) => {
-  if (!event) return null;
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useModalA11y(!!event, onClose, dialogRef);
 
-  const isPast = event.status === 'selesai';
+  const isPast = event ? getEventStatus(event.dateIso, event.timeStart) === 'selesai' : false;
+
+  if (!event) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className="bg-white border-4 border-black rounded-3xl max-w-2xl w-full shadow-[12px_12px_0px_#000] overflow-hidden max-h-[90vh] flex flex-col">
+      <div
+        ref={dialogRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-label={event.title}
+        className="bg-white border-4 border-black rounded-3xl max-w-2xl w-full shadow-[12px_12px_0px_#000] overflow-hidden max-h-[90vh] flex flex-col"
+      >
         
         {/* Header Bar */}
         <div className={`p-5 border-b-4 border-black flex items-center justify-between ${event.bgColor}`}>
@@ -118,11 +130,11 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
                   <button
                     key={photo.id}
                     onClick={() => onOpenPhoto(photo, event.photos)}
-                    className="relative aspect-4/3 rounded-2xl overflow-hidden border-2 border-black shadow-[3px_3px_0px_#000] hover:scale-105 transition-transform cursor-pointer bg-stone-200 group"
+                    className="relative h-32 sm:h-40 rounded-2xl overflow-hidden border-2 border-black shadow-[3px_3px_0px_#000] hover:scale-105 transition-transform cursor-pointer bg-stone-200 group"
                   >
                     <img
                       src={photo.url}
-                      alt={photo.caption}
+                      alt={photo.caption || 'Dokumentasi kegiatan RT 09'}
                       referrerPolicy="no-referrer"
                       className="w-full h-full object-cover"
                     />

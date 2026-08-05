@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PhoneCall, MapPin, Mail, Users, MessageSquare, CheckCircle2, ShieldCheck, HelpCircle } from 'lucide-react';
+import { PhoneCall, MapPin, MessageSquare, CheckCircle2, ShieldCheck, HelpCircle } from 'lucide-react';
 import { triggerMerdekaConfetti } from '../utils/confetti';
 
 export const KontakPanitia: React.FC = () => {

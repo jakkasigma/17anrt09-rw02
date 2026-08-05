@@ -5,6 +5,7 @@ import { TimelineMap } from './components/TimelineMap';
 import { JadwalLomba } from './components/JadwalLomba';
 import { PapanUcapan } from './components/PapanUcapan';
 import { KontakPanitia } from './components/KontakPanitia';
+import { Galeri } from './components/Galeri';
 import { GaleriModal } from './components/GaleriModal';
 import { EventDetailModal } from './components/EventDetailModal';
 import { Footer } from './components/Footer';
@@ -93,6 +94,13 @@ export default function App() {
         {activeTab === 'lomba' && (
           <div className="pt-4">
             <JadwalLomba lombaList={lombaList} />
+            <PapanUcapan wishes={wishes} onAddWish={handleAddWish} />
+          </div>
+        )}
+
+        {activeTab === 'galeri' && (
+          <div className="pt-4">
+            <Galeri events={events} onOpenPhoto={handleOpenPhoto} />
             <PapanUcapan wishes={wishes} onAddWish={handleAddWish} />
           </div>
         )}

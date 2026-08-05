@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Trophy, MessageSquareHeart, Compass, Sparkles, Heart, Users, Gift, ShieldCheck } from 'lucide-react';
+import { Calendar, Trophy, MessageSquareHeart, Compass, Sparkles, Heart, Users, ShieldCheck } from 'lucide-react';
 import { triggerMerdekaConfetti } from '../utils/confetti';
 
 interface HeroProps {

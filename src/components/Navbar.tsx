@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Menu, X, Calendar, Trophy, PhoneCall, MapPin, Flag } from 'lucide-react';
+import { Sparkles, Menu, X, Calendar, Trophy, PhoneCall, MapPin, Flag, Images } from 'lucide-react';
 import { triggerPestaFireworks } from '../utils/confetti';
 
 interface NavbarProps {
@@ -14,6 +14,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
     { id: 'beranda', label: 'Beranda', icon: Flag },
     { id: 'timeline', label: 'Timeline Peta Acara', icon: Calendar, badge: 'Utama' },
     { id: 'lomba', label: 'Jadwal Lomba', icon: Trophy, badge: '17-an' },
+    { id: 'galeri', label: 'Galeri Foto', icon: Images },
     { id: 'kontak', label: 'Kontak & Info RT', icon: PhoneCall },
   ];
 

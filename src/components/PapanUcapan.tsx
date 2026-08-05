@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ResidentWish } from '../types';
-import { MessageSquareHeart, Send, Heart, Sparkles, Smile, ShieldCheck } from 'lucide-react';
+import { MessageSquareHeart, Send, Heart, Sparkles } from 'lucide-react';
 import { triggerMerdekaConfetti } from '../utils/confetti';
 
 interface PapanUcapanProps {
@@ -159,6 +159,11 @@ export const PapanUcapan: React.FC<PapanUcapanProps> = ({ wishes, onAddWish }) =
                       </span>
                     </div>
                   </div>
+
+                  <span className="inline-flex items-center gap-1 bg-rose-100 border border-black rounded-lg px-2 py-1 text-[11px] font-black text-rose-700 shrink-0">
+                    <Heart className="w-3 h-3 fill-rose-500 text-rose-500" />
+                    {w.likes}
+                  </span>
                 </div>
 
                 <p className="text-stone-800 text-xs sm:text-sm font-medium leading-relaxed bg-stone-50 p-3 rounded-xl border border-stone-300">

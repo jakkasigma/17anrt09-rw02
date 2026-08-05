@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { LombaItem } from '../types';
+import { useModalA11y } from '../utils/useModalA11y';
 import { Trophy, Calendar, MapPin, UserCheck, Gift, Phone, X } from 'lucide-react';
 
 interface JadwalLombaProps {
@@ -8,6 +9,8 @@ interface JadwalLombaProps {
 
 export const JadwalLomba: React.FC<JadwalLombaProps> = ({ lombaList }) => {
   const [selected, setSelected] = useState<LombaItem | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useModalA11y(!!selected, () => setSelected(null), dialogRef);
 
   const lombaAnak = lombaList.filter((item) => item.category === 'Anak-Anak');
   const lombaUmum = lombaList.filter((item) => item.category === 'Umum');
@@ -140,6 +143,11 @@ export const JadwalLomba: React.FC<JadwalLombaProps> = ({ lombaList }) => {
             onClick={() => setSelected(null)}
           >
             <div
+              ref={dialogRef}
+              tabIndex={-1}
+              role="dialog"
+              aria-modal="true"
+              aria-label={`Detail Lomba: ${selected.title}`}
               onClick={(e) => e.stopPropagation()}
               className="bg-white border-4 border-black rounded-3xl max-w-lg w-full shadow-[10px_10px_0px_#000] relative max-h-[90vh] overflow-y-auto"
             >

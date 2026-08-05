@@ -18,7 +18,6 @@ export interface TimelineEvent {
   timeStart: string;
   location: string;
   category: 'Pra-Acara' | 'Lomba' | 'Religi/Budaya' | 'Puncak Acara';
-  status: EventStatus;
   emoji: string;
   bgColor: string; // e.g., 'bg-sky-200', 'bg-amber-200', 'bg-emerald-200', 'bg-rose-200'
   accentColor: string;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, Sparkles, Flag, ArrowUp } from 'lucide-react';
+import { Heart, Sparkles, ArrowUp } from 'lucide-react';
 import { triggerPestaFireworks } from '../utils/confetti';
 
 interface FooterProps {
@@ -75,6 +75,10 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
             <span>•</span>
             <button onClick={() => setActiveTab('lomba')} className="hover:underline cursor-pointer">
               Jadwal Lomba
+            </button>
+            <span>•</span>
+            <button onClick={() => setActiveTab('galeri')} className="hover:underline cursor-pointer">
+              Galeri Foto
             </button>
             <span>•</span>
             <button onClick={() => setActiveTab('kontak')} className="hover:underline cursor-pointer">
