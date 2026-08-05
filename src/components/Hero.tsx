@@ -18,7 +18,7 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, stats }) => {
   });
 
   useEffect(() => {
-    const targetDate = toEventMsWib('2026-08-17', '07:00');
+    const targetDate = toEventMsWib('2026-08-17', '00:00');
 
     const updateCountdown = () => {
       const now = new Date().getTime();
@@ -42,11 +42,11 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, stats }) => {
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-stone-50 pt-8 pb-12 border-b-4 border-black">
+    <section className="relative overflow-hidden bg-stone-50 pt-8 pb-0">
       {/* Background playful dotted pattern */}
       <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(#000_2px,transparent_2px)] [background-size:24px_24px]"></div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pb-12">
         
         {/* Top Floating Stickers & Announcement Banner */}
         <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
@@ -158,49 +158,29 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, stats }) => {
           </div>
         </div>
 
-        {/* Quick Highlights / Stats Grid Neubrutalism */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-red-100 border-3 border-black rounded-2xl p-4 shadow-[4px_4px_0px_#000] flex items-center gap-3">
-            <div className="w-12 h-12 bg-white border-2 border-black rounded-xl flex items-center justify-center text-2xl shadow-[2px_2px_0px_#000]">
-              🗺️
-            </div>
-            <div>
-              <span className="block font-black text-2xl text-black">{stats.nodes} Node</span>
-              <span className="text-xs font-extrabold text-stone-700">Peta Acara Ceria</span>
-            </div>
-          </div>
-
-          <div className="bg-amber-100 border-3 border-black rounded-2xl p-4 shadow-[4px_4px_0px_#000] flex items-center gap-3">
-            <div className="w-12 h-12 bg-white border-2 border-black rounded-xl flex items-center justify-center text-2xl shadow-[2px_2px_0px_#000]">
-              🏆
-            </div>
-            <div>
-              <span className="block font-black text-2xl text-black">{stats.lomba} Lomba</span>
-              <span className="text-xs font-extrabold text-stone-700">Anak & Dewasa</span>
-            </div>
-          </div>
-
-          <div className="bg-red-50 border-3 border-black rounded-2xl p-4 shadow-[4px_4px_0px_#000] flex items-center gap-3">
-            <div className="w-12 h-12 bg-white border-2 border-black rounded-xl flex items-center justify-center text-2xl shadow-[2px_2px_0px_#000]">
-              🍚
-            </div>
-            <div>
-              <span className="block font-black text-2xl text-black">81 Tumpeng</span>
-              <span className="text-xs font-extrabold text-stone-700">Malam Tasyakuran</span>
-            </div>
-          </div>
-
-          <div className="bg-amber-200 border-3 border-black rounded-2xl p-4 shadow-[4px_4px_0px_#000] flex items-center gap-3">
-            <div className="w-12 h-12 bg-white border-2 border-black rounded-xl flex items-center justify-center text-2xl shadow-[2px_2px_0px_#000]">
-              🎁
-            </div>
-            <div>
-              <span className="block font-black text-2xl text-black">Doorprize</span>
-              <span className="text-xs font-extrabold text-stone-700">Sepeda & Alat Masak</span>
-            </div>
-          </div>
         </div>
 
+      {/* Running Ticker / Marquee — full bleed */}
+      <div className="bg-red-700 border-y-4 border-black overflow-hidden relative z-10">
+        <div className="flex w-max whitespace-nowrap animate-[ticker_25s_linear_infinite] hover:[animation-play-state:paused]">
+          {[0, 1].map((dup) => (
+            <div key={dup} className="flex items-center gap-3 px-4 py-3" aria-hidden={dup === 1}>
+              <span className="bg-white border-2 border-black rounded-full px-3.5 py-1 text-black font-black text-sm shadow-[2px_2px_0px_#000]">
+                🗺️ {stats.nodes} Node · Peta Acara Ceria
+              </span>
+              <span className="bg-white border-2 border-black rounded-full px-3.5 py-1 text-black font-black text-sm shadow-[2px_2px_0px_#000]">
+                🏆 {stats.lomba} Lomba · Anak & Dewasa
+              </span>
+              <span className="bg-white border-2 border-black rounded-full px-3.5 py-1 text-black font-black text-sm shadow-[2px_2px_0px_#000]">
+                🍚 Tumpengan · Malam Tasyakuran
+              </span>
+              <span className="bg-white border-2 border-black rounded-full px-3.5 py-1 text-black font-black text-sm shadow-[2px_2px_0px_#000]">
+                🎁 Doorprize · Sepeda & Alat Masak
+              </span>
+              <span className="text-yellow-300 font-black text-sm px-1">⭐ HUT RI KE-81</span>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -51,16 +51,22 @@ export const Galeri: React.FC<GaleriProps> = ({ events, onOpenPhoto }) => {
 
             {groups.map((event) => (
               <div key={event.id}>
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="text-3xl">{event.emoji}</span>
-                  <div>
-                    <h3 className="text-xl sm:text-2xl font-black text-black tracking-tight">
-                      {event.title}
-                    </h3>
-                    <span className="text-xs font-bold text-stone-600">
-                      {event.date} • {event.photos.length} foto
-                    </span>
+                <div className={`mb-6 sm:mb-8 border-b-8 ${event.accentColor} pb-4 sm:pb-6`}>
+                  <div className={`inline-flex items-center gap-1.5 sm:gap-2 ${event.bgColor} text-black font-black text-xs sm:text-sm px-3 sm:px-4 py-1.5 rounded-full border-3 border-black shadow-[3px_3px_0px_#000] -rotate-1`}>
+                    <span className="text-base sm:text-xl">{event.emoji}</span>
+                    <span>{event.category.toUpperCase()}</span>
                   </div>
+
+                  <h3 className="text-2xl sm:text-4xl font-black text-black tracking-tight mt-3 sm:mt-4">
+                    {event.title}{' '}
+                    <span className={`${event.bgColor} text-black px-2.5 sm:px-3 py-0.5 rounded-xl border-2 sm:border-3 border-black inline-block shadow-[3px_3px_0px_#000] rotate-1`}>
+                      {event.photos.length} Foto
+                    </span>
+                  </h3>
+
+                  <p className="text-stone-600 font-bold text-xs sm:text-sm mt-2 sm:mt-3">
+                    {event.date} • {event.category}
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4 items-start">
