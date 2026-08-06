@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { TimelineEvent, PhotoDocumentation } from '../types';
 import { getEventStatus } from '../utils/eventStatus';
 import { toEventMsWib } from '../utils/date';
@@ -10,53 +10,56 @@ interface TimelineMapProps {
   onOpenEventDetail: (event: TimelineEvent) => void;
 }
 
-const WAVE_X: [number, number][] = [
-  [60, 80], [950, 920], [380, 340], [980, 940], [40, 90], [880, 850],
-  [120, 150], [940, 900], [300, 260], [970, 930], [80, 130]
-];
+interface Pt {
+  x: number;
+  y: number;
+}
 
-const buildPathD = () => {
-  let d = 'M 500 60';
-  WAVE_X.forEach(([x1, x2], i) => {
-    const y0 = 60 + i * 180;
-    const y1 = y0 + 180;
-    d += ` C ${x1} ${y0}, ${x2} ${y1}, 500 ${y1}`;
-  });
-  return d;
-};
-
-const MAP_PATH_D = buildPathD();
-
-const getMarkerPoint = (index: number) => {
-  const [x1, x2] = WAVE_X[index % WAVE_X.length];
-  const y = 60 + index * 180 + 90;
-  const x = (1000 + 3 * (x1 + x2)) / 8;
-  return { x, y };
-};
-
-const bezierPoint = (x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, t: number) => {
+const bezierPoint = (p0: Pt, c1: Pt, c2: Pt, p3: Pt, t: number): Pt => {
   const mt = 1 - t;
   const a = mt * mt * mt;
   const b = 3 * mt * mt * t;
   const c = 3 * mt * t * t;
   const d = t * t * t;
   return {
-    x: a * x0 + b * x1 + c * x2 + d * x3,
-    y: a * y0 + b * y1 + c * y2 + d * y3
+    x: a * p0.x + b * c1.x + c * c2.x + d * p3.x,
+    y: a * p0.y + b * c1.y + c * c2.y + d * p3.y
   };
 };
 
-const getPathPointBetween = (i: number, fraction: number) => {
-  const y0 = 60 + i * 180;
-  const [x1, x2] = WAVE_X[i % WAVE_X.length];
-  const [xn1, xn2] = WAVE_X[(i + 1) % WAVE_X.length];
-  if (fraction <= 0.5) {
-    const t = 0.5 + fraction;
-    return bezierPoint(500, y0, x1, y0, x2, y0 + 180, 500, y0 + 180, t);
+const buildPathD = (pts: Pt[]) => {
+  if (pts.length < 2) return '';
+  let d = `M ${pts[0].x} ${pts[0].y}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p = pts[i];
+    const n = pts[i + 1];
+    const midY = (p.y + n.y) / 2;
+    d += ` C ${n.x} ${midY}, ${p.x} ${midY}, ${n.x} ${n.y}`;
   }
-  const t = 2 * fraction - 1;
-  return bezierPoint(500, y0 + 180, xn1, y0 + 180, xn2, y0 + 360, 500, y0 + 360, t);
+  return d;
 };
+
+const pathPoint = (pts: Pt[], i: number, t: number): Pt => {
+  const p = pts[i];
+  const n = pts[i + 1];
+  const midY = (p.y + n.y) / 2;
+  return bezierPoint(p, { x: n.x, y: midY }, { x: p.x, y: midY }, n, t);
+};
+
+const MAP_ICONS: { emoji: string; fx: number; fy: number; cls: string }[] = [
+  { emoji: '❌', fx: 0.24, fy: 0.06, cls: 'text-xl' },
+  { emoji: '🏝️', fx: 0.78, fy: 0.12, cls: 'text-xl' },
+  { emoji: '⚓', fx: 0.35, fy: 0.22, cls: 'text-xl' },
+  { emoji: '🏴‍☠️', fx: 0.88, fy: 0.28, cls: 'text-xl' },
+  { emoji: '🌴', fx: 0.18, fy: 0.35, cls: 'text-2xl' },
+  { emoji: '💎', fx: 0.42, fy: 0.43, cls: 'text-xl' },
+  { emoji: '🏆', fx: 0.7, fy: 0.41, cls: 'text-xl' },
+  { emoji: '🗺️', fx: 0.83, fy: 0.49, cls: 'text-xl' },
+  { emoji: '🚩', fx: 0.12, fy: 0.55, cls: 'text-sm' },
+  { emoji: '⭐', fx: 0.2, fy: 0.6, cls: 'text-xl' },
+  { emoji: '🎈', fx: 0.86, fy: 0.7, cls: 'text-xl' },
+  { emoji: '🎁', fx: 0.3, fy: 0.73, cls: 'text-xl' }
+];
 
 const formatIso = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -67,6 +70,42 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
   onOpenEventDetail,
 }) => {
   const [filterStatus, setFilterStatus] = useState<'semua' | 'selesai' | 'mendatang' | 'anak'>('semua');
+
+  const mapAreaRef = useRef<HTMLDivElement>(null);
+  const [points, setPoints] = useState<Pt[]>([]);
+  const [size, setSize] = useState({ w: 0, h: 0 });
+
+  // Measure real card positions so the path aligns with the grid at any breakpoint
+  useEffect(() => {
+    const el = mapAreaRef.current;
+    if (!el) return;
+    let raf = 0;
+    const measure = () => {
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) return;
+      const pts: Pt[] = [];
+      el.querySelectorAll<HTMLButtonElement>('button[data-idx]').forEach((b) => {
+        const br = b.getBoundingClientRect();
+        pts.push({ x: br.left + br.width / 2 - r.left, y: br.top + br.height / 2 - r.top });
+      });
+      pts.sort((a, b) => a.y - b.y);
+      setPoints(pts);
+      setSize({ w: r.width, h: r.height });
+    };
+    const t1 = window.setTimeout(measure, 120);
+    const t2 = window.setTimeout(measure, 600);
+    const ro = new ResizeObserver(() => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(measure);
+    });
+    ro.observe(el);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+    };
+  }, [filterStatus]);
 
   // Today marker: refresh every minute
   const [now, setNow] = useState<Date>(() => new Date());
@@ -89,31 +128,34 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
     );
   }
 
-  let marker: { x: number; y: number };
+  let marker: Pt = { x: 0, y: 0 };
   let markerIsToday = false;
+  const mapPathD = buildPathD(points);
 
   const firstMs = toEventMsWib(events[0].dateIso, events[0].timeStart);
   const lastMs = toEventMsWib(events[events.length - 1].dateIso, events[events.length - 1].timeStart);
 
-  if (nowMs < firstMs) {
-    marker = { x: 500, y: 60 };
-  } else if (nowMs >= lastMs) {
-    marker = { x: 500, y: 2040 };
-    markerIsToday = todayIso === events[events.length - 1].dateIso;
-  } else {
-    const nextIdx = events.findIndex((e) => toEventMsWib(e.dateIso, e.timeStart) > nowMs);
-    const prevIdx = nextIdx - 1;
-    const prevMs = toEventMsWib(events[prevIdx].dateIso, events[prevIdx].timeStart);
-    const nextMs = toEventMsWib(events[nextIdx].dateIso, events[nextIdx].timeStart);
-    const fraction = (nowMs - prevMs) / (nextMs - prevMs);
-    if (fraction <= 0) {
-      marker = getMarkerPoint(prevIdx);
-    } else if (fraction >= 1) {
-      marker = getMarkerPoint(nextIdx);
+  if (points.length > 0) {
+    if (nowMs < firstMs) {
+      marker = points[0];
+    } else if (nowMs >= lastMs) {
+      marker = points[points.length - 1];
+      markerIsToday = todayIso === events[events.length - 1].dateIso;
     } else {
-      marker = getPathPointBetween(prevIdx, fraction);
+      const nextIdx = events.findIndex((e) => toEventMsWib(e.dateIso, e.timeStart) > nowMs);
+      const prevIdx = nextIdx - 1;
+      const prevMs = toEventMsWib(events[prevIdx].dateIso, events[prevIdx].timeStart);
+      const nextMs = toEventMsWib(events[nextIdx].dateIso, events[nextIdx].timeStart);
+      const fraction = (nowMs - prevMs) / (nextMs - prevMs);
+      if (fraction <= 0) {
+        marker = points[prevIdx];
+      } else if (fraction >= 1) {
+        marker = points[nextIdx];
+      } else {
+        marker = pathPoint(points, prevIdx, fraction);
+      }
+      markerIsToday = events[prevIdx].dateIso === todayIso || events[nextIdx].dateIso === todayIso;
     }
-    markerIsToday = events[prevIdx].dateIso === todayIso || events[nextIdx].dateIso === todayIso;
   }
 
   // Filter events
@@ -233,55 +275,48 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
         </div>
 
         {/* ROADMAP ADVENTURE MAP AREA */}
-        <div className="relative py-2">
+        <div className="relative py-2" ref={mapAreaRef}>
 
           {/* SVG WINDING TREASURE MAP DASHED PATH */}
-          <div className="absolute inset-0 pointer-events-none block z-0">
-            <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1000 2100">
-              {/* Outer Thick Black Dash Outline connecting central axis S-curve */}
-              <path
-                d={MAP_PATH_D}
-                fill="none"
-                stroke="#000"
-                strokeWidth="10"
-                strokeDasharray="16 12"
-                strokeLinecap="round"
-              />
-              {/* Inner Crimson Red Treasure Path */}
-              <path
-                d={MAP_PATH_D}
-                fill="none"
-                stroke="#dc2626"
-                strokeWidth="4"
-                strokeDasharray="16 12"
-                strokeLinecap="round"
-              />
-              {/* Decorative Treasure Map Icons scattered irregularly */}
-              <g>
-                {/* Start marker */}
-                <text x="500" y="48" className="text-3xl font-black">🚩</text>
-                <text x="240" y="150" className="text-2xl font-black">❌</text>
-                <text x="780" y="300" className="text-2xl font-black">🏝️</text>
-                <text x="350" y="540" className="text-2xl font-black">⚓</text>
-                <text x="880" y="690" className="text-2xl font-black">🏴‍☠️</text>
-                <text x="180" y="880" className="text-3xl font-black">🌴</text>
-                <text x="420" y="1080" className="text-2xl font-black">💎</text>
-                <text x="700" y="1020" className="text-2xl font-black">🏆</text>
-                <text x="830" y="1230" className="text-2xl font-black">🗺️</text>
-                <text x="120" y="1380" className="text-xl font-black">🚩</text>
-                <text x="200" y="1500" className="text-2xl font-black">⭐</text>
-                <text x="860" y="1750" className="text-2xl font-black">🎈</text>
-                <text x="300" y="1830" className="text-2xl font-black">🎁</text>
-                {/* End marker */}
-                <text x="500" y="2052" className="text-3xl font-black">🏆</text>
-              </g>
-            </svg>
-          </div>
+          {size.w > 0 && size.h > 0 && (
+            <div className="absolute inset-0 pointer-events-none block z-0">
+              <svg className="w-full h-full" preserveAspectRatio="none" viewBox={`0 0 ${size.w} ${size.h}`}>
+                <path
+                  d={mapPathD}
+                  fill="none"
+                  stroke="#000"
+                  strokeWidth={Math.max(3, size.w / 100)}
+                  strokeDasharray={`${Math.max(6, size.w / 42)} ${Math.max(5, size.w / 55)}`}
+                  strokeLinecap="round"
+                />
+                <path
+                  d={mapPathD}
+                  fill="none"
+                  stroke="#dc2626"
+                  strokeWidth={Math.max(1.5, size.w / 250)}
+                  strokeDasharray={`${Math.max(6, size.w / 42)} ${Math.max(5, size.w / 55)}`}
+                  strokeLinecap="round"
+                />
+                <g>
+                  <text x={size.w / 2} y={Math.max(14, size.w / 60)} className="text-xl sm:text-2xl font-black" textAnchor="middle">🚩</text>
+                  {MAP_ICONS.map((ic, i) => (
+                    <text key={i} x={ic.fx * size.w} y={ic.fy * size.h} className={`${ic.cls} font-black`} textAnchor="middle">
+                      {ic.emoji}
+                    </text>
+                  ))}
+                  {points.length > 0 && (
+                    <text x={points[points.length - 1].x} y={points[points.length - 1].y + Math.max(14, size.w / 60)} className="text-xl sm:text-2xl font-black" textAnchor="middle">🏆</text>
+                  )}
+                </g>
+              </svg>
+            </div>
+          )}
 
           {/* TODAY POSITION MARKER ON THE PATH */}
+          {size.w > 0 && size.h > 0 && points.length > 0 && (
           <div
             className="absolute z-20 pointer-events-none"
-            style={{ left: `${(marker.x / 1000) * 100}%`, top: `${(marker.y / 2100) * 100}%` }}
+            style={{ left: `${(marker.x / size.w) * 100}%`, top: `${(marker.y / size.h) * 100}%` }}
           >
             <div className="absolute -translate-x-1/2 -translate-y-1/2">
               <span className="relative block w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-red-600 border-2 border-black shadow-[2px_2px_0px_#000]">
@@ -289,12 +324,13 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
               </span>
             </div>
 
-            <div className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap ${marker.y < 300 ? 'top-4' : '-top-9'}`}>
+            <div className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap ${marker.y < size.h * 0.18 ? 'top-4' : '-top-9'}`}>
               <span className="bg-black text-white text-[10px] sm:text-xs font-black px-2.5 py-1 rounded-lg border-2 border-white shadow-[2px_2px_0px_#000] flex items-center gap-1 animate-pulse">
                 📍 {markerIsToday ? 'HARI INI' : 'KITA DI SINI'}
               </span>
             </div>
           </div>
+          )}
 
           {/* EVENT CARDS - SAME LAYOUT ALL BREAKPOINTS */}
           <div className="space-y-6 lg:space-y-14 relative z-10">
@@ -309,13 +345,28 @@ export const TimelineMap: React.FC<TimelineMapProps> = ({
               const desktopCardContent = (
                 <button
                   type="button"
-                  onClick={() => onOpenEventDetail(evt)}
-                  className={`w-full max-w-[150px] sm:max-w-[220px] md:max-w-[280px] lg:max-w-[340px] ${getOffsetX(index)} rounded-2xl p-2 sm:p-4 transition-all duration-300 transform hover:-translate-y-1.5 hover:scale-[1.02] cursor-pointer group text-left ${rotationClass} ${
+                  data-idx={index}
+                  disabled={evt.isLocked}
+                  onClick={evt.isLocked ? undefined : () => onOpenEventDetail(evt)}
+                  aria-label={evt.isLocked ? 'Pos terkunci - belum bisa dibuka' : `Lihat detail ${evt.title}`}
+                  className={`w-full max-w-[150px] sm:max-w-[220px] md:max-w-[280px] lg:max-w-[340px] ${evt.isLocked ? '' : getOffsetX(index)} rounded-2xl p-2 sm:p-4 transition-all duration-300 transform hover:-translate-y-1.5 hover:scale-[1.02] group text-left ${evt.isLocked ? 'relative overflow-hidden cursor-not-allowed bg-zinc-900 border-3 border-black shadow-[4px_4px_0px_#000]' : `cursor-pointer ${rotationClass} ${
                     isPast
                       ? `${evt.bgColor} border-3 border-black shadow-[4px_4px_0px_#000] hover:shadow-[7px_7px_0px_#000]`
                       : `bg-white ${evt.bgColor}/30 border-3 border-dashed border-stone-800 opacity-95 shadow-[4px_4px_0px_rgba(0,0,0,0.8)] hover:shadow-[7px_7px_0px_#000]`
-                  }`}
+                  }`}`}
                 >
+                  {/* Locked fog overlay - fog of war */}
+                  {evt.isLocked && (
+                    <div className="absolute inset-0 z-30 bg-gradient-to-b from-black/70 via-black/50 to-black/80 flex flex-col items-center justify-center gap-1.5 pointer-events-none">
+                      <span className="text-3xl sm:text-4xl drop-shadow-[2px_2px_0px_#000]">🔒</span>
+                      <span className="bg-red-600 text-white text-[8px] sm:text-[10px] font-black px-2 sm:px-3 py-1 rounded-lg border-2 border-black shadow-[2px_2px_0px_#000] rotate-[-2deg]">
+                        AREA TERKUNCI
+                      </span>
+                      <span className="text-white/70 text-[7px] sm:text-[10px] font-bold text-center px-2 leading-tight animate-pulse">
+                        ??? • Belum Terpetakan
+                      </span>
+                    </div>
+                  )}
                   {/* CARD HEADER BADGES */}
                   <div className="flex items-center justify-between gap-1 sm:gap-1.5 mb-1.5 sm:mb-2">
                     <div className="flex items-center gap-0.5 sm:gap-1">

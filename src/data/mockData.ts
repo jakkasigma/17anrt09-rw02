@@ -26,7 +26,7 @@ export const INITIAL_PENGUMUMAN: Announcement[] = [
   {
     id: 'a-2',
     title: 'Jalan Sehat CarNavaL',
-    message: 'Akan diagendakan Jalan Sehat CarNavaL, kostum bebas (lucu, sport, badut), kritik membangun monggo. Pokoknya meriah! Viral 🙏',
+    message: 'Jalan Sehat CarNavaL mulai jam 06.00 WIB! Kostum bebas (lucu, sport, badut), kritik membangun monggo. Ada sarapan gratis — tapi menu masih rahasia, kira-kira apa yaa??🤔 Pokoknya meriah!',
     date: '5 Agustus 2026',
     tag: 'Info',
     emoji: '🎉'
@@ -119,7 +119,7 @@ const NON_LOMBA_EVENTS: TimelineEvent[] = [
   },
   {
     id: 'evt-11',
-    stepNumber: 10,
+    stepNumber: 11,
     title: 'Malam Tasyakuran HUT RI ke-81',
     subtitle: 'Renungan, Doa Bersama, Potong Tumpeng & Pembagian Hadiah',
     date: 'Minggu, 16 Agustus 2026',
@@ -139,20 +139,20 @@ const NON_LOMBA_EVENTS: TimelineEvent[] = [
   },
   {
     id: 'evt-12',
-    stepNumber: 11,
+    stepNumber: 12,
     title: 'Jalan Sehat CarNavaL',
     subtitle: 'Kostum Bebas & Karnaval Meriah',
     date: 'Minggu, 23 Agustus 2026',
     dateIso: '2026-08-23',
-    time: '07.00 - Selesai WIB',
-    timeStart: '07:00',
+    time: '06.00 - Selesai WIB',
+    timeStart: '06:00',
     location: 'Lapangan Badminton RT 09',
     category: 'Umum',
     emoji: '🎉',
     bgColor: 'bg-fuchsia-100',
     accentColor: 'border-fuchsia-600',
-    description: 'Jalan Sehat CarNavaL warga RT 09 dengan kostum bebas sesuai kreativitas: lucu, sport, badut, hingga tema kritis membangun. Sesuai ajakan Pak RT, ajak seluruh keluarga anak cucu cicit, pokoknya meriah! Doorprize menanti para peserta, pengumuman seputar doorprize menyusul.',
-    highlights: ['Kostum bebas: lucu, sport, badut, kritis membangun', 'Ajak keluarga: anak cucu cicit', 'Doorprize menanti — pengumuman menyusul'],
+    description: 'Jalan Sehat CarNavaL warga RT 09 dengan kostum bebas sesuai kreativitas: lucu, sport, badut, hingga tema kritis membangun. Sesuai ajakan Pak RT, ajak seluruh keluarga anak cucu cicit, pokoknya meriah! Doorprize menanti para peserta. Oh iya, ada sarapan gratis! Tapi menu masih rahasia... kira-kira apa yaa??🤔 Pas hari-H baru dibuka, tebak-tebakan warga dibuka mulai sekarang!',
+    highlights: ['🍽️ Ada sarapan gratis! Menu masih rahasia — kira-kira apa yaa?? 🤔', 'Kostum bebas: lucu, sport, badut, kritis membangun', 'Ajak keluarga: anak cucu cicit', 'Doorprize menanti — pengumuman menyusul'],
     photos: [],
     isKidFriendly: true
   }
@@ -321,8 +321,35 @@ const LOMBA_MASTER: LombaMaster[] = [
     isKidFriendly: true
   },
   {
-    id: 'l-9',
+    id: 'l-8',
     stepNumber: 8,
+    title: 'Lomba ??? 🔒',
+    subtitle: 'Nama Lomba Terkunci - Segera Terungkap',
+    category: 'Umum',
+    emoji: '🔒',
+    date: 'Jumat, 14 Agustus 2026',
+    dateIso: '2026-08-14',
+    time: '19.00 WIB',
+    timeStart: '19:00',
+    location: 'Lapangan Badminton RT 09',
+    picName: 'Satya',
+    picPhone: '0813-2510-6276',
+    registeredCount: 0,
+    maxParticipants: 12,
+    prizes: ['Dirahasiakan panitia - kejutan menanti di hari-H!'],
+    rules: ['Nama lomba & aturan main masih dikunci panitia', 'Jenis lomba masih jadi teka-teki - tebak-tebakan warga dibuka!', 'Pantau pengumuman panitia untuk info lanjutan'],
+    bgColor: 'bg-stone-200',
+    accentColor: 'border-stone-700',
+    status: 'Segera',
+    description: 'Masih ada satu lomba lagi yang dirahasiakan panitia! Nama dan jenisnya masih terkunci gembok 🔒 sampai hari-H. Kira-kira lombanya apa yaa?? Siap-siap tebak, kejutan menanti!',
+    highlights: ['🔒 Nama lomba masih terkunci rahasia', '🤔 Kira-kira lombanya apa yaa?', 'Kejutan hadiah dirahasiakan panitia'],
+    photos: [],
+    isKidFriendly: false,
+    isLocked: true
+  },
+  {
+    id: 'l-9',
+    stepNumber: 9,
     title: 'Estafet Air',
     subtitle: 'Kategori Umum - Kelompok Diacak Panitia',
     category: 'Umum',
@@ -348,11 +375,11 @@ const LOMBA_MASTER: LombaMaster[] = [
   },
   {
     id: 'l-10',
-    stepNumber: 9,
-    title: 'Estafet Pakai Domino',
-    subtitle: 'Kategori Umum Warga - Malam Hari',
+    stepNumber: 10,
+    title: 'Lomba ??? 🔒',
+    subtitle: 'Nama Lomba Terkunci - Segera Terungkap',
     category: 'Umum',
-    emoji: '🁣',
+    emoji: '🔒',
     date: 'Sabtu, 15 Agustus 2026',
     dateIso: '2026-08-15',
     time: '19.00 WIB',
@@ -360,17 +387,18 @@ const LOMBA_MASTER: LombaMaster[] = [
     location: 'Lapangan Badminton RT 09',
     picName: 'Satya',
     picPhone: '0813-2510-6276',
-    registeredCount: 8,
+    registeredCount: 0,
     maxParticipants: 12,
-    prizes: ['Hadiah Tunai + Parcel Raksasa Juara 1', 'Parcel Sembako Juara 2', 'Paket Snack Komplek Juara 3'],
-    rules: ['Kategori umum warga RT 09', 'Susun domino berjajar secara estafet', 'Jatuh sebelum garis finish dihitung ulang'],
-    bgColor: 'bg-emerald-100',
-    accentColor: 'border-emerald-600',
-    status: 'Pendaftaran Dibuka',
-    description: 'Lomba menyusun domino secara berjajar secara estafet untuk umum. Kompak dan cekatan tim jadi kunci agar susunan domino tidak roboh sebelum garis finish!',
-    highlights: ['Kategori umum warga RT 09', 'Susun domino berjajar secara estafet', 'Jatuh sebelum garis finish dihitung ulang'],
+    prizes: ['Dirahasiakan panitia - kejutan menanti di hari-H!'],
+    rules: ['Nama lomba & aturan main masih dikunci panitia', 'Jenis lomba masih jadi teka-teki - tebak-tebakan warga dibuka!', 'Pantau pengumuman panitia untuk info lanjutan'],
+    bgColor: 'bg-stone-200',
+    accentColor: 'border-stone-700',
+    status: 'Segera',
+    description: 'Masih ada satu lomba lagi yang dirahasiakan panitia! Nama dan jenisnya masih terkunci gembok 🔒 sampai hari-H. Kira-kira lombanya apa yaa?? Siap-siap tebak, kejutan menanti!',
+    highlights: ['🔒 Nama lomba masih terkunci rahasia', '🤔 Kira-kira lombanya apa yaa?', 'Kejutan hadiah dirahasiakan panitia'],
     photos: [],
-    isKidFriendly: false
+    isKidFriendly: false,
+    isLocked: true
   }
 ];
 
@@ -397,7 +425,8 @@ const toEvent = (l: LombaMaster): TimelineEvent => ({
   picName: l.picName,
   picPhone: l.picPhone,
   status: l.status,
-  ...(l.isKidFriendly !== undefined ? { isKidFriendly: l.isKidFriendly } : {})
+  ...(l.isKidFriendly !== undefined ? { isKidFriendly: l.isKidFriendly } : {}),
+  ...(l.isLocked ? { isLocked: true } : {})
 });
 
 export const INITIAL_LOMBA: LombaItem[] = LOMBA_MASTER.map(

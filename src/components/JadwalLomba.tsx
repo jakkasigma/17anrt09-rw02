@@ -82,11 +82,30 @@ export const JadwalLomba: React.FC<JadwalLombaProps> = ({ lombaList, onOpenDetai
                 <button
                   type="button"
                   key={lomba.id}
-                  onClick={() => onOpenDetail(lomba)}
-                  className="bg-white border-2 sm:border-4 border-black rounded-2xl sm:rounded-3xl p-2 sm:p-4 shadow-[4px_4px_0px_#000] sm:shadow-[6px_6px_0px_#000] hover:shadow-[8px_8px_0px_#000] hover:-translate-y-1 hover:rotate-[-0.5deg] transition-all flex flex-col cursor-pointer group text-left"
+                  disabled={lomba.isLocked}
+                  onClick={lomba.isLocked ? undefined : () => onOpenDetail(lomba)}
+                  aria-label={lomba.isLocked ? 'Lomba terkunci - belum bisa dibuka' : `Lihat detail ${lomba.title}`}
+                  className={`bg-white border-2 sm:border-4 border-black rounded-2xl sm:rounded-3xl p-2 sm:p-4 shadow-[4px_4px_0px_#000] sm:shadow-[6px_6px_0px_#000] hover:shadow-[8px_8px_0px_#000] hover:-translate-y-1 hover:rotate-[-0.5deg] transition-all flex flex-col group text-left ${
+                    lomba.isLocked
+                      ? 'bg-zinc-900 cursor-not-allowed hover:shadow-[4px_4px_0px_#000] hover:-translate-y-0 hover:rotate-0 relative overflow-hidden'
+                      : 'cursor-pointer'
+                  }`}
                 >
+                  {/* Locked fog overlay */}
+                  {lomba.isLocked && (
+                    <div className="absolute inset-0 z-20 bg-gradient-to-b from-black/75 via-black/60 to-black/80 flex flex-col items-center justify-center gap-1 pointer-events-none">
+                      <span className="text-3xl sm:text-5xl drop-shadow-[2px_2px_0px_#000]">🔒</span>
+                      <span className="bg-red-600 text-white text-[8px] sm:text-xs font-black px-2 sm:px-3 py-1 rounded-lg border-2 border-black shadow-[2px_2px_0px_#000] rotate-[-2deg]">
+                        TERKUNCI
+                      </span>
+                      <span className="text-white/70 text-[7px] sm:text-[11px] font-bold text-center px-2 leading-tight">
+                        Masih Misteri • Buka Hari-H
+                      </span>
+                    </div>
+                  )}
+
                   {/* Pin & Emoji */}
-                  <div className="flex items-start justify-between mb-1.5 sm:mb-3">
+                  <div className={`flex items-start justify-between mb-1.5 sm:mb-3 ${lomba.isLocked ? 'opacity-30 blur-[2px]' : ''}`}>
                     <span className="text-2xl sm:text-5xl group-hover:scale-110 group-hover:rotate-6 transition-transform">
                       {lomba.emoji}
                     </span>
@@ -96,18 +115,18 @@ export const JadwalLomba: React.FC<JadwalLombaProps> = ({ lombaList, onOpenDetai
                   </div>
 
                   {/* Title */}
-                  <h4 className="text-[11px] sm:text-lg font-black text-black leading-tight truncate group-hover:text-red-600 transition-colors">
+                  <h4 className={`text-[11px] sm:text-lg font-black text-black leading-tight truncate group-hover:text-red-600 transition-colors ${lomba.isLocked ? 'text-zinc-300 group-hover:text-zinc-300 opacity-40 blur-[1px]' : ''}`}>
                     {lomba.title}
                   </h4>
 
                   {/* Date & Time */}
-                  <div className="text-[8px] sm:text-xs font-bold text-red-600 flex items-center gap-0.5 sm:gap-1 mt-0.5 truncate">
+                  <div className={`text-[8px] sm:text-xs font-bold text-red-600 flex items-center gap-0.5 sm:gap-1 mt-0.5 truncate ${lomba.isLocked ? 'opacity-40 blur-[1px]' : ''}`}>
                     <Calendar className="w-2 h-2 sm:w-3.5 sm:h-3.5 inline shrink-0" />
                     <span className="truncate">{lomba.date} ({lomba.time})</span>
                   </div>
 
                   {/* Category & Status Badges */}
-                  <div className="flex items-center justify-between gap-1 mt-1.5 sm:mt-3">
+                  <div className={`flex items-center justify-between gap-1 mt-1.5 sm:mt-3 ${lomba.isLocked ? 'opacity-40 blur-[1px]' : ''}`}>
                     <span className="bg-sky-200 text-stone-900 text-[7px] sm:text-xs font-black px-1 py-0.5 sm:px-2 sm:py-1 rounded-md sm:rounded-lg border border-black sm:border-2 truncate max-w-[60%]">
                       {lomba.category}
                     </span>
@@ -117,14 +136,22 @@ export const JadwalLomba: React.FC<JadwalLombaProps> = ({ lombaList, onOpenDetai
                   </div>
 
                   {/* Location + Click hint */}
-                  <div className="mt-1.5 sm:mt-3 space-y-1">
+                  <div className={`mt-1.5 sm:mt-3 space-y-1 ${lomba.isLocked ? 'opacity-30 blur-[1px]' : ''}`}>
                     <div className="text-[8px] sm:text-[11px] font-bold text-stone-700 flex items-center gap-1 truncate">
                       <MapPin className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-red-600 shrink-0" />
                       <span className="truncate">{lomba.location}</span>
                     </div>
-                    <div className="text-[8px] sm:text-[11px] font-black bg-amber-200 border border-black sm:border-2 rounded-lg text-center py-0.5 sm:py-1.5 flex items-center justify-center gap-1">
-                      Klik untuk detail
-                      <ChevronRight className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
+                    <div className={`text-[8px] sm:text-[11px] font-black border border-black sm:border-2 rounded-lg text-center py-0.5 sm:py-1.5 flex items-center justify-center gap-1 ${
+                      lomba.isLocked ? 'bg-zinc-700 text-zinc-400' : 'bg-amber-200'
+                    }`}>
+                      {lomba.isLocked ? (
+                        <>🔒 Terkunci <span className="animate-pulse">...</span></>
+                      ) : (
+                        <>
+                          Klik untuk detail
+                          <ChevronRight className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
+                        </>
+                      )}
                     </div>
                   </div>
                 </button>

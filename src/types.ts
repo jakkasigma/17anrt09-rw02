@@ -31,6 +31,7 @@ export interface TimelineEvent {
   picName?: string;
   picPhone?: string;
   status?: 'Pendaftaran Dibuka' | 'Segera' | 'Selesai';
+  isLocked?: boolean;
 }
 
 export interface LombaItem {
@@ -49,6 +50,7 @@ export interface LombaItem {
   rules: string[];
   bgColor: string;
   status: 'Pendaftaran Dibuka' | 'Segera' | 'Selesai';
+  isLocked?: boolean;
 }
 
 export type AnnouncementTag = 'Penting' | 'Info' | 'Pengumuman';

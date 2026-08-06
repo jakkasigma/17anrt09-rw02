@@ -1,6 +1,6 @@
 import React from 'react';
 import { LombaItem } from '../types';
-import { Trophy, Calendar, Clock, Users, ChevronRight } from 'lucide-react';
+import { Trophy, Calendar, Clock, Users, ChevronRight, Lock } from 'lucide-react';
 
 interface RingkasanLombaProps {
   lombaList: LombaItem[];
@@ -51,15 +51,36 @@ export const RingkasanLomba: React.FC<RingkasanLombaProps> = ({ lombaList, setAc
             <button
               type="button"
               key={lomba.id}
-              className={`${lomba.bgColor} border-4 border-black rounded-3xl p-5 shadow-[7px_7px_0px_#000] hover:shadow-[4px_4px_0px_#000] hover:-translate-y-1.5 transition-all cursor-pointer relative overflow-hidden text-left ${ROTATION_CLASSES[index % ROTATION_CLASSES.length]}`}
-              onClick={() => onOpenEventDetail(lomba)}
+              disabled={lomba.isLocked}
+              onClick={lomba.isLocked ? undefined : () => onOpenEventDetail(lomba)}
+              aria-label={lomba.isLocked ? 'Lomba terkunci - belum bisa dibuka' : `Lihat detail ${lomba.title}`}
+              className={`border-4 border-black rounded-3xl p-5 shadow-[7px_7px_0px_#000] hover:shadow-[4px_4px_0px_#000] hover:-translate-y-1.5 transition-all relative overflow-hidden text-left ${
+                lomba.isLocked
+                  ? 'bg-zinc-900 cursor-not-allowed hover:shadow-[7px_7px_0px_#000] hover:-translate-y-0'
+                  : `${lomba.bgColor} cursor-pointer ${ROTATION_CLASSES[index % ROTATION_CLASSES.length]}`
+              }`}
             >
-              {/* Corner badge */}
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-md border-2 border-black shadow-[2px_2px_0px_#000] rotate-6">
-                #{index + 1} 🔥
-              </span>
+              {/* Locked fog overlay */}
+              {lomba.isLocked && (
+                <div className="absolute inset-0 z-20 bg-gradient-to-b from-black/75 via-black/60 to-black/80 flex flex-col items-center justify-center gap-1.5 pointer-events-none">
+                  <span className="text-4xl drop-shadow-[2px_2px_0px_#000]">🔒</span>
+                  <span className="bg-red-600 text-white text-[10px] font-black px-3 py-1 rounded-lg border-2 border-black shadow-[2px_2px_0px_#000] rotate-[-2deg]">
+                    TERKUNCI
+                  </span>
+                  <span className="text-white/70 text-xs font-bold text-center px-2 leading-tight">
+                    Masih Misteri • Buka Hari-H
+                  </span>
+                </div>
+              )}
 
-              <div className="flex items-center justify-between gap-2">
+              {/* Corner badge */}
+              {!lomba.isLocked && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-md border-2 border-black shadow-[2px_2px_0px_#000] rotate-6">
+                  #{index + 1} 🔥
+                </span>
+              )}
+
+              <div className={`flex items-center justify-between gap-2 ${lomba.isLocked ? 'opacity-30 blur-[2px]' : ''}`}>
                 <div className="w-12 h-12 bg-white rounded-xl border-2 border-black flex items-center justify-center text-2xl shadow-[2px_2px_0px_#000]">
                   {lomba.emoji}
                 </div>
@@ -68,16 +89,16 @@ export const RingkasanLomba: React.FC<RingkasanLombaProps> = ({ lombaList, setAc
                 </span>
               </div>
 
-              <div>
+              <div className={lomba.isLocked ? 'opacity-40 blur-[1px] mt-2' : ''}>
                 <span className="text-[10px] font-black text-red-600 uppercase tracking-wider">
                   {lomba.category}
                 </span>
-                <h3 className="text-base font-black text-black leading-tight">
+                <h3 className={`text-base font-black leading-tight ${lomba.isLocked ? 'text-zinc-300' : 'text-black'}`}>
                   {lomba.title}
                 </h3>
               </div>
 
-              <div className="space-y-1 text-xs font-bold text-stone-800">
+              <div className={`space-y-1 text-xs font-bold text-stone-800 ${lomba.isLocked ? 'opacity-40 blur-[1px]' : ''}`}>
                 <div className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-red-600" /> {lomba.date}
                 </div>
@@ -86,10 +107,21 @@ export const RingkasanLomba: React.FC<RingkasanLombaProps> = ({ lombaList, setAc
                 </div>
               </div>
 
-              <div className="mt-3 pt-2 border-t-2 border-black/20">
-                <span className="inline-flex items-center gap-1.5 bg-black text-white text-[11px] font-black px-2.5 py-1 rounded-lg border border-black shadow-[2px_2px_0px_#000]">
-                  <Users className="w-3.5 h-3.5 text-amber-300" />
-                  {lomba.registeredCount} peserta{lomba.maxParticipants ? ` / ${lomba.maxParticipants}` : ''}
+              <div className={`mt-3 pt-2 border-t-2 border-black/20 ${lomba.isLocked ? 'opacity-30 blur-[1px]' : ''}`}>
+                <span className={`inline-flex items-center gap-1.5 text-[11px] font-black px-2.5 py-1 rounded-lg border border-black shadow-[2px_2px_0px_#000] ${
+                  lomba.isLocked ? 'bg-zinc-700 text-zinc-400' : 'bg-black text-white'
+                }`}>
+                  {lomba.isLocked ? (
+                    <span className="flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-red-400" />
+                      Terkunci 🔒
+                    </span>
+                  ) : (
+                    <>
+                      <Users className="w-3.5 h-3.5 text-amber-300" />
+                      {lomba.registeredCount} peserta{lomba.maxParticipants ? ` / ${lomba.maxParticipants}` : ''}
+                    </>
+                  )}
                 </span>
               </div>
             </button>

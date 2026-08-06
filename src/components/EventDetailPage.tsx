@@ -30,6 +30,36 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({
 
   if (!event) return null;
 
+  if (event.isLocked) {
+    return (
+      <div className="min-h-screen bg-[#0c0a09] text-stone-900 flex items-center justify-center px-4 py-16">
+        <div className="max-w-md w-full text-center space-y-5">
+          <div className="w-20 h-20 mx-auto bg-zinc-900 rounded-3xl border-4 border-black shadow-[5px_5px_0px_#000] flex items-center justify-center text-5xl rotate-[-4deg]">
+            🔒
+          </div>
+          <h1 className="text-3xl font-black text-white leading-tight">
+            Area Terkunci
+          </h1>
+          <p className="text-sm font-bold text-zinc-400 leading-relaxed">
+            Info pos ini masih disegel panitia layaknya peta harta karun yang belum terbuka. Tebak-tebakan warga dibuka — nama & isi lombanya jadi misteri sampai hari-H!
+          </p>
+          <span className="inline-block bg-red-600 text-white text-xs font-black px-4 py-2 rounded-xl border-2 border-black shadow-[3px_3px_0px_#000] rotate-[-1deg]">
+            ??? TERKUNCI - BUKA HARI-H ???
+          </span>
+          <div>
+            <button
+              onClick={onBack}
+              className="bg-white hover:bg-stone-200 text-black font-black text-xs px-5 py-2.5 rounded-xl border-2 border-black shadow-[2px_2px_0px_#000] cursor-pointer flex items-center gap-1.5 mx-auto"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Kembali</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const isLomba = !!event.status;
   const dateStatus = getEventStatus(event.dateIso, event.timeStart, event.timeEnd);
 
